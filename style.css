@@ -1,0 +1,252 @@
+/* Colori Principali: Rosso (#B20710, come Frecciarossa) e Bianco */
+:root {
+    --primary-color: #B20710; /* Rosso */
+    --secondary-color: #f4f4f4; /* Grigio chiaro per sfondo */
+    --text-color: #333;
+    --white: #fff;
+    --light-red: #ffdddd;
+    --success-color: #28a745; /* Verde per squadre qualificate */
+}
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: var(--secondary-color);
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+header {
+    background-color: var(--primary-color);
+    color: var(--white);
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+h1, h2, h3 {
+    color: var(--text-color);
+    text-transform: uppercase;
+}
+
+header h1 {
+    color: var(--white);
+    font-size: 2.5em;
+    margin: 0;
+}
+
+main {
+    max-width: 1000px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: var(--white);
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+hr {
+    border: 0;
+    height: 1px;
+    background-image: linear-gradient(to right, rgba(0, 0, 0, 0), var(--primary-color), rgba(0, 0, 0, 0));
+    margin: 30px 0;
+}
+
+/* --- Sezione Squadre Fanta --- */
+#squadre {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+#lista-squadre {
+    /* NASCONDE LA LISTA CHE CREAVA LA RIGA DUPLICATA DEI PULSANTI */
+    display: none;
+    list-style: none;
+    padding: 0;
+    margin-bottom: 20px;
+}
+
+/* --- Filtri per le Squadre --- */
+#filtri-squadre {
+    text-align: center;
+    margin-top: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+}
+
+.filtro-squadra-btn {
+    padding: 10px 15px;
+    border: 2px solid var(--primary-color);
+    background-color: var(--white);
+    color: var(--primary-color);
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s, transform 0.1s;
+    font-weight: bold;
+}
+
+.filtro-squadra-btn:hover {
+    background-color: var(--light-red);
+    transform: translateY(-2px);
+}
+
+.filtro-squadra-btn.active {
+    background-color: var(--primary-color);
+    color: var(--white);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+
+/* --- Filtri per il Calendario (esistente) --- */
+#filtri-turni {
+    text-align: center;
+    margin-bottom: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+}
+
+.filtro-btn {
+    padding: 10px 15px;
+    border: 2px solid var(--primary-color);
+    background-color: var(--white);
+    color: var(--primary-color);
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+    font-weight: bold;
+}
+
+.filtro-btn:hover {
+    background-color: var(--light-red);
+}
+
+.filtro-btn.active {
+    background-color: var(--primary-color);
+    color: var(--white);
+}
+
+/* --- Sezione Calendario e Allineamento --- */
+#contenuto-calendario {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.turno-container {
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background-color: var(--secondary-color);
+}
+
+.turno-container h3 {
+    margin-top: 0;
+    font-size: 1.5em;
+    color: var(--primary-color);
+}
+
+.turno-container p {
+    font-style: italic;
+    font-size: 0.9em;
+    color: #666;
+    margin-bottom: 15px;
+}
+
+.partita {
+    /* Allineamento corretto con Grid */
+    display: grid;
+    grid-template-columns: 1fr auto minmax(150px, 250px); 
+    align-items: center;
+    gap: 15px; 
+    padding: 10px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.partita:last-child {
+    border-bottom: none;
+}
+
+.squadre {
+    font-weight: bold;
+    text-align: left;
+    white-space: nowrap; 
+}
+
+.risultato {
+    background-color: #eee;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 1em;
+    font-weight: bold;
+    min-width: 60px;
+    text-align: center;
+}
+
+.fantallenatori-coinvolti { 
+    font-size: 0.9em;
+    color: var(--primary-color);
+    font-weight: bold;
+    text-align: right;
+    white-space: nowrap; 
+}
+
+/* --- Evidenziazione Squadre Qualificate (Hover Style) --- */
+
+.squadra-qualificata {
+    color: var(--success-color);
+    font-weight: 900; 
+    cursor: help; 
+    transition: text-shadow 0.3s ease-out;
+}
+
+.squadra-qualificata:hover {
+    text-shadow: 0 0 5px var(--success-color), 0 0 10px rgba(40, 167, 69, 0.5); 
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* --- Sezioni Finali (Palmarès Corretto) --- */
+#sezioni-finali {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: space-between;
+}
+
+.blocco-risultato {
+    flex: 1 1 calc(33.33% - 20px);
+    min-width: 280px;
+    background-color: #f9f9f9;
+    padding: 15px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.05);
+}
+
+.dati-inseribili {
+    white-space: pre-wrap;
+    background-color: var(--white);
+    border: 1px solid #ccc;
+    padding: 10px;
+    min-height: 150px;
+    /* STILE PALMARES AGGIORNATO: Rimuoviamo il grassetto dal contenuto, ma manteniamo la dimensione e il colore. */
+    font-family: Arial, sans-serif; 
+    font-size: 0.9em;
+    font-weight: normal; /* CORREZIONE: NON GRASSETTO */
+    color: var(--text-color); 
+    line-height: 1.8;
+}
+
+footer {
+    text-align: center;
+    padding: 10px;
+    margin-top: 20px;
+    color: #888;
+    font-size: 0.8em;
+}
