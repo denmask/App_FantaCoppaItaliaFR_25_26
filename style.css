@@ -1,12 +1,12 @@
 :root {
-  --ita-green: #008C45;
-  --ita-red: #CD212A;
+  --ita-green: #008c45;
+  --ita-red: #cd212a;
   --ita-white: #ffffff;
   --bg: #f8f9fc;
 }
 
 body {
-  font-family: 'Segoe UI', system-ui, sans-serif;
+  font-family: "Segoe UI", system-ui, sans-serif;
   background: var(--bg);
   margin: 0;
   color: #333;
@@ -16,12 +16,17 @@ header {
   background: white;
   text-align: center;
   padding-bottom: 20px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
 }
 
 .tricolore-bar {
   height: 6px;
-  background: linear-gradient(90deg, var(--ita-green) 33%, #ddd 33% 66%, var(--ita-red) 66%);
+  background: linear-gradient(
+    90deg,
+    var(--ita-green) 33%,
+    #ddd 33% 66%,
+    var(--ita-red) 66%
+  );
 }
 
 header h1 {
@@ -49,7 +54,7 @@ section {
   padding: 25px;
   border-radius: 16px;
   margin-bottom: 20px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
 }
 
 /* Select / Filtri */

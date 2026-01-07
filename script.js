@@ -2,17 +2,17 @@ let db = {};
 
 document.addEventListener("DOMContentLoaded", () => {
   fetch("data.json")
-    .then(r => r.json())
-    .then(data => {
+    .then((r) => r.json())
+    .then((data) => {
       db = data;
       init();
     });
 });
 
 function init() {
-  buildFilters();   // checkbox
-  render();         // calendario
-  updateRanking();  // classifica
+  buildFilters(); // checkbox
+  render(); // calendario
+  updateRanking(); // classifica
 }
 
 // ---- FILTRI CON CHECKBOX ----
@@ -47,7 +47,7 @@ function buildFilters() {
 
     if (target.id === "chk-all") {
       const allChecked = target.checked;
-      container.querySelectorAll('input[type="checkbox"]').forEach(chk => {
+      container.querySelectorAll('input[type="checkbox"]').forEach((chk) => {
         chk.checked = allChecked;
       });
     } else {
@@ -56,9 +56,9 @@ function buildFilters() {
 
       const checkboxes = Array.from(
         container.querySelectorAll('input[type="checkbox"]')
-      ).filter(chk => chk.id !== "chk-all");
+      ).filter((chk) => chk.id !== "chk-all");
 
-      const allSinglesChecked = checkboxes.every(chk => chk.checked);
+      const allSinglesChecked = checkboxes.every((chk) => chk.checked);
       if (allSinglesChecked) {
         chkAll.checked = true;
       }
@@ -75,11 +75,11 @@ function applyFilterFromCheckbox() {
   let selectedTeams = [];
 
   if (chkAll.checked) {
-    selectedTeams = db.squadreFanta.map(s => s.squadra);
+    selectedTeams = db.squadreFanta.map((s) => s.squadra);
   } else {
     selectedTeams = Array.from(
       container.querySelectorAll('input[type="checkbox"][data-squadra]:checked')
-    ).map(chk => chk.dataset.squadra);
+    ).map((chk) => chk.dataset.squadra);
   }
 
   filter(selectedTeams);
@@ -99,19 +99,19 @@ function render() {
     title.textContent = turno.toUpperCase();
     wrapper.appendChild(title);
 
-    db.calendario[turno].partite.forEach(p => {
+    db.calendario[turno].partite.forEach((p) => {
       const card = document.createElement("div");
       card.className = "match-card";
       card.dataset.teams = `${p.casa} ${p.ospite}`;
 
-      const fCasa = db.squadreFanta.find(s => s.squadra === p.casa);
-      const fOspite = db.squadreFanta.find(s => s.squadra === p.ospite);
+      const fCasa = db.squadreFanta.find((s) => s.squadra === p.casa);
+      const fOspite = db.squadreFanta.find((s) => s.squadra === p.ospite);
 
       let winnerText = "Da giocare";
       let winnerSide = null; // 'casa' | 'ospite'
 
       if (p.risultato && p.risultato.includes("-")) {
-        const [gCasa, gOspite] = p.risultato.split("-").map(n => parseInt(n));
+        const [gCasa, gOspite] = p.risultato.split("-").map((n) => parseInt(n));
         if (!isNaN(gCasa) && !isNaN(gOspite)) {
           if (gCasa > gOspite) {
             const nomeF = fCasa ? ` (${fCasa.fantallenatore})` : "";
@@ -127,8 +127,10 @@ function render() {
         }
       }
 
-      const classCasa = winnerSide === "casa" ? "team-name team-winner" : "team-name";
-      const classOspite = winnerSide === "ospite" ? "team-name team-winner" : "team-name";
+      const classCasa =
+        winnerSide === "casa" ? "team-name team-winner" : "team-name";
+      const classOspite =
+        winnerSide === "ospite" ? "team-name team-winner" : "team-name";
 
       card.innerHTML = `
         <div>
@@ -155,15 +157,15 @@ function render() {
 
 function updateRanking() {
   const container = document.getElementById("ranking-container");
-  const weights = { "ottavi": 1, "quarti": 2, "semifinali": 3, "finale": 4 };
+  const weights = { ottavi: 1, quarti: 2, semifinali: 3, finale: 4 };
 
-  let ranking = db.squadreFanta.map(s => {
+  let ranking = db.squadreFanta.map((s) => {
     let maxTurno = "Nessuno";
     let weight = 0;
     let eliminated = false;
 
     for (const turno in db.calendario) {
-      db.calendario[turno].partite.forEach(p => {
+      db.calendario[turno].partite.forEach((p) => {
         if (p.casa === s.squadra || p.ospite === s.squadra) {
           if (weights[turno] >= weight) {
             maxTurno = turno;
@@ -191,21 +193,22 @@ function updateRanking() {
 
   ranking.sort((a, b) => b.weight - a.weight || a.eliminated - b.eliminated);
 
-  container.innerHTML = ranking.map((r, index) => {
-    const posizione = index + 1;
+  container.innerHTML = ranking
+    .map((r, index) => {
+      const posizione = index + 1;
 
-    let statusText;
-    if (r.maxTurno === "finale" && !r.eliminated) {
-      statusText = "Vittoria finale";
-    } else if (r.eliminated) {
-      statusText = `Uscito ai ${r.maxTurno}`;
-    } else {
-      statusText = `In gara (${r.maxTurno})`;
-    }
+      let statusText;
+      if (r.maxTurno === "finale" && !r.eliminated) {
+        statusText = "Vittoria finale";
+      } else if (r.eliminated) {
+        statusText = `Uscito ai ${r.maxTurno}`;
+      } else {
+        statusText = `In gara (${r.maxTurno})`;
+      }
 
-    const badgeClass = r.eliminated ? "eliminato" : "in-gara";
+      const badgeClass = r.eliminated ? "eliminato" : "in-gara";
 
-    return `
+      return `
       <div class="ranking-row">
         <div>
           <span class="rank-name">${posizione}. ${r.fantallenatore} (${r.squadra})</span>
@@ -215,18 +218,19 @@ function updateRanking() {
         </div>
       </div>
     `;
-  }).join("");
+    })
+    .join("");
 }
 
 // ---- FILTRO MATCH IN BASE ALLE SQUADRE ----
 
 function filter(selectedTeams) {
-  document.querySelectorAll(".match-card").forEach(c => {
+  document.querySelectorAll(".match-card").forEach((c) => {
     if (!selectedTeams || selectedTeams.length === 0) {
       c.style.display = "flex";
       return;
     }
-    const match = selectedTeams.some(s => c.dataset.teams.includes(s));
+    const match = selectedTeams.some((s) => c.dataset.teams.includes(s));
     c.style.display = match ? "flex" : "none";
   });
 }
