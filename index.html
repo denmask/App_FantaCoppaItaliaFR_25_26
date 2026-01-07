@@ -3,68 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fantacoppa Italia Frecciarossa</title>
+    <title>Fantacoppa Frecciarossa</title>
     <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
     <header>
-        <h1 id="torneo-nome">Fantacoppa Italia Frecciarossa</h1>
+        <div class="logo-area">
+            <h1>Fantacoppa Italia</h1>
+            <div class="freccia-text">Frecciarossa</div>
+        </div>
     </header>
 
     <main>
-
-        <!-- SEZIONE SQUADRE -->
-        <section id="squadre">
-            <h2>🏆 Squadre Fanta Partecipanti</h2>
-
-            <ul id="lista-squadre"></ul>
-
-            <div id="filtri-squadre">
-                <button class="filtro-squadra-btn active" data-squadra="all">Tutte le Squadre</button>
+        <section id="filtri">
+            <div class="filter-group">
+                <h3>🔍 Filtra Squadra</h3>
+                <div id="filtri-squadre" class="scroll-x">
+                    <button class="btn-f btn-active" data-squadra="all">Tutte</button>
+                </div>
+            </div>
+            <div class="filter-group">
+                <h3>📅 Turno</h3>
+                <div id="filtri-turni" class="scroll-x">
+                    <button class="btn-t btn-active" data-turno="all">Tutti</button>
+                </div>
             </div>
         </section>
 
-        <hr>
-
-        <!-- SEZIONE CALENDARIO -->
-        <section id="calendario">
-            <h2>📅 Calendario e Risultati</h2>
-
-            <div id="filtri-turni">
-                <button class="filtro-btn active" data-turno="all">Tutti i Turni</button>
-            </div>
-
+        <section id="calendario-container">
             <div id="contenuto-calendario"></div>
         </section>
 
-        <hr>
-
-        <!-- SEZIONI FINALI -->
-        <section id="sezioni-finali">
-            <h2>📊 Dati Post-Finale</h2>
-
-            <div class="blocco-risultato" id="classifica-finale">
-                <h3>Classifica Finale Ufficiale Coppa Italia</h3>
-                <pre class="dati-inseribili"></pre>
-            </div>
-
-            <div class="blocco-risultato" id="classifica-fantallenatori">
-                <h3>Classifica Fantallenatori Fantacoppa</h3>
-                <pre class="dati-inseribili"></pre>
-            </div>
-
-            <div class="blocco-risultato" id="palmares-fantacoppa">
-                <h3>Palmarès Storico Fantacoppa Italia</h3>
-                <pre class="dati-inseribili"></pre>
+        <section id="classifiche-auto">
+            <div class="grid-stats">
+                <div class="stat-card">
+                    <h4>📊 Ranking Fantallenatori (Auto)</h4>
+                    <div id="ranking-fanta" class="ranking-list"></div>
+                </div>
+                <div class="stat-card">
+                    <h4>🏆 Albo d'Oro</h4>
+                    <pre id="palmares" class="box-data"></pre>
+                </div>
             </div>
         </section>
-
     </main>
-
-    <footer>
-        <p>&copy; 2025/26 Fantacoppa Italia</p>
-    </footer>
 
     <script src="script.js"></script>
 </body>

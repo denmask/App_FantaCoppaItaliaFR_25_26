@@ -1,19 +1,17 @@
 {
   "nomeTorneo": "Fantacoppa Italia Frecciarossa 2025/26",
-
   "squadreFanta": [
-    "Udinese",
-    "Milan",
-    "Inter",
-    "Juve",
-    "Napoli",
-    "Roma",
-    "Lazio",
-    "Fiorentina",
-    "Bologna",
-    "Atalanta"
+    { "squadra": "Udinese", "fantallenatore": "Kevin Sandri" },
+    { "squadra": "Milan", "fantallenatore": "Lorenzo Moro" },
+    { "squadra": "Inter", "fantallenatore": "Federico Burello" },
+    { "squadra": "Juve", "fantallenatore": "Denis Mascherin" },
+    { "squadra": "Napoli", "fantallenatore": "Mattia Beltrame" },
+    { "squadra": "Roma", "fantallenatore": "Alex Beltrame" },
+    { "squadra": "Lazio", "fantallenatore": "Cristian Tartaro" },
+    { "squadra": "Fiorentina", "fantallenatore": "Valentina Pozzi" },
+    { "squadra": "Bologna", "fantallenatore": "Nicola Marano" },
+    { "squadra": "Atalanta", "fantallenatore": "Kevin Di Bernardo" }
   ],
-
   "calendario": {
     "trentaduesimi": {
       "date": "15 - 18 Agosto 2025",
@@ -22,17 +20,16 @@
           "casa": "Milan",
           "ospite": "Bari",
           "risultato": "2-0",
-          "fantallenatoriCoinvolti": ["Lorenzo Moro"]
+          "fanta": ["Lorenzo Moro"]
         },
         {
           "casa": "Udinese",
           "ospite": "Carrarese",
           "risultato": "2-0",
-          "fantallenatoriCoinvolti": ["Kevin Sandri"]
+          "fanta": ["Kevin Sandri"]
         }
       ]
     },
-
     "secondoTurno": {
       "date": "23 - 25 Settembre 2025",
       "partite": [
@@ -40,107 +37,100 @@
           "casa": "Udinese",
           "ospite": "Palermo",
           "risultato": "2-1",
-          "fantallenatoriCoinvolti": ["Kevin Sandri"]
+          "fanta": ["Kevin Sandri"]
         },
         {
           "casa": "Milan",
           "ospite": "Lecce",
           "risultato": "3-0",
-          "fantallenatoriCoinvolti": ["Lorenzo Moro"]
+          "fanta": ["Lorenzo Moro"]
         }
       ]
     },
-
     "ottavi": {
-      "date": "2-4 Dicembre 2025 e 13/27 Gennaio 2026",
+      "date": "Dicembre 2025 - Gennaio 2026",
       "partite": [
         {
           "casa": "Juventus",
           "ospite": "Udinese",
           "risultato": "2-0",
-          "fantallenatoriCoinvolti": ["Denis Mascherin", "Kevin Sandri"]
+          "fanta": ["Denis Mascherin", "Kevin Sandri"]
         },
         {
           "casa": "Atalanta",
           "ospite": "Genoa",
           "risultato": "4-0",
-          "fantallenatoriCoinvolti": ["Kevin Di Bernardo"]
+          "fanta": ["Kevin Di Bernardo"]
         },
         {
           "casa": "Napoli",
           "ospite": "Cagliari",
           "risultato": "10-9 D.C.R.",
-          "fantallenatoriCoinvolti": ["Mattia Beltrame"]
+          "fanta": ["Mattia Beltrame"]
         },
         {
           "casa": "Inter",
           "ospite": "Venezia",
           "risultato": "5-1",
-          "fantallenatoriCoinvolti": ["Federico Burello"]
+          "fanta": ["Federico Burello"]
         },
         {
           "casa": "Bologna",
           "ospite": "Parma",
           "risultato": "2-1",
-          "fantallenatoriCoinvolti": ["Nicola Marano"]
+          "fanta": ["Nicola Marano"]
         },
         {
           "casa": "Lazio",
           "ospite": "Milan",
           "risultato": "1-0",
-          "fantallenatoriCoinvolti": ["Cristian Tartaro", "Lorenzo Moro"]
+          "fanta": ["Cristian Tartaro", "Lorenzo Moro"]
         },
-
         {
           "casa": "Roma",
           "ospite": "Torino",
           "risultato": "0-0",
-          "fantallenatoriCoinvolti": ["Alex Beltrame"]
+          "fanta": ["Alex Beltrame"]
         },
         {
           "casa": "Fiorentina",
           "ospite": "Como",
           "risultato": "0-0",
-          "fantallenatoriCoinvolti": ["Valentina Pozzi"]
+          "fanta": ["Valentina Pozzi"]
         }
       ]
     },
-
     "quarti": {
       "date": "4 e 11 Febbraio 2026",
       "partite": [
-        { "casa": "Atalanta", "ospite": "Juventus", "risultato": "Da giocare", "fantallenatoriCoinvolti": ["Kevin Di Bernardo","Denis Mascherin"] },
-        { "casa": "Inter", "ospite": "Roma", "risultato": "Da giocare", "fantallenatoriCoinvolti": ["Federico Burello","Alex Beltrame"] },
-        { "casa": "Bologna", "ospite": "Lazio", "risultato": "Da giocare", "fantallenatoriCoinvolti": ["Nicola Marano","Cristian Tartaro"] },
-        { "casa": "Fiorentina", "ospite": "Napoli", "risultato": "Da giocare", "fantallenatoriCoinvolti": ["Valentina Pozzi","Mattia Beltrame"] }
-      ]
-    },
-
-    "semifinali": {
-      "date": "4 Marzo 2026 e 22 Aprile 2026",
-      "partite": [
-        { "casa": "?", "ospite": "?", "risultato": "Da giocare", "fantallenatoriCoinvolti": [] },
-        { "casa": "?", "ospite": "?", "risultato": "Da giocare", "fantallenatoriCoinvolti": [] }
-      ]
-    },
-
-    "finale": {
-      "date": "13 Maggio 2026 (Roma)",
-      "partite": [
         {
-          "casa": "Vincente Semifinale 1",
-          "ospite": "Vincente Semifinale 2",
+          "casa": "Atalanta",
+          "ospite": "Juventus",
           "risultato": "Da giocare",
-          "fantallenatoriCoinvolti": []
+          "fanta": ["Kevin Di Bernardo", "Denis Mascherin"]
+        },
+        {
+          "casa": "Inter",
+          "ospite": "Roma",
+          "risultato": "Da giocare",
+          "fanta": ["Federico Burello", "Alex Beltrame"]
+        },
+        {
+          "casa": "Bologna",
+          "ospite": "Lazio",
+          "risultato": "Da giocare",
+          "fanta": ["Nicola Marano", "Cristian Tartaro"]
+        },
+        {
+          "casa": "Fiorentina",
+          "ospite": "Napoli",
+          "risultato": "Da giocare",
+          "fanta": ["Valentina Pozzi", "Mattia Beltrame"]
         }
       ]
     }
   },
-
-  "classificaFinale": "Inserisci qui manualmente la classifica ufficiale (es. 1° Juventus, 2° Inter, ecc.)",
-
-  "classificaFantallenatori": "Inserisci qui manualmente la classifica dei Fantallenatori (es. 1° Mario Rossi, 2° Luigi Bianchi, ecc.)",
-
-  "palmares": "2025/2026: 🏆 (ANCORA DA ASSEGNARE)\n2024/2025: 🏆 BOLOGNA ❤️💙 FEDERICO BURELLO\n2023/2024: 🏆 JUVENTUS 🖤🤍 DENIS MASCHERIN"
+  "classificaFinale": "In attesa della finale del 13 Maggio 2026.",
+  "classificaFantallenatori": "Ranking basato sul progresso nel tabellone.",
+  "palmares": "2025/2026: 🏆 (IN CORSO)\n2024/2025: 🏆 BOLOGNA - FEDERICO BURELLO\n2023/2024: 🏆 JUVENTUS - DENIS MASCHERIN."
 }
-
