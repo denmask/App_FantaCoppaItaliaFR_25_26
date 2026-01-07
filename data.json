@@ -13,124 +13,26 @@
     { "squadra": "Atalanta", "fantallenatore": "Kevin Di Bernardo" }
   ],
   "calendario": {
-    "trentaduesimi": {
-      "date": "15 - 18 Agosto 2025",
-      "partite": [
-        {
-          "casa": "Milan",
-          "ospite": "Bari",
-          "risultato": "2-0",
-          "fanta": ["Lorenzo Moro"]
-        },
-        {
-          "casa": "Udinese",
-          "ospite": "Carrarese",
-          "risultato": "2-0",
-          "fanta": ["Kevin Sandri"]
-        }
-      ]
-    },
-    "secondoTurno": {
-      "date": "23 - 25 Settembre 2025",
-      "partite": [
-        {
-          "casa": "Udinese",
-          "ospite": "Palermo",
-          "risultato": "2-1",
-          "fanta": ["Kevin Sandri"]
-        },
-        {
-          "casa": "Milan",
-          "ospite": "Lecce",
-          "risultato": "3-0",
-          "fanta": ["Lorenzo Moro"]
-        }
-      ]
-    },
     "ottavi": {
-      "date": "Dicembre 2025 - Gennaio 2026",
       "partite": [
-        {
-          "casa": "Juventus",
-          "ospite": "Udinese",
-          "risultato": "2-0",
-          "fanta": ["Denis Mascherin", "Kevin Sandri"]
-        },
-        {
-          "casa": "Atalanta",
-          "ospite": "Genoa",
-          "risultato": "4-0",
-          "fanta": ["Kevin Di Bernardo"]
-        },
-        {
-          "casa": "Napoli",
-          "ospite": "Cagliari",
-          "risultato": "10-9 D.C.R.",
-          "fanta": ["Mattia Beltrame"]
-        },
-        {
-          "casa": "Inter",
-          "ospite": "Venezia",
-          "risultato": "5-1",
-          "fanta": ["Federico Burello"]
-        },
-        {
-          "casa": "Bologna",
-          "ospite": "Parma",
-          "risultato": "2-1",
-          "fanta": ["Nicola Marano"]
-        },
-        {
-          "casa": "Lazio",
-          "ospite": "Milan",
-          "risultato": "1-0",
-          "fanta": ["Cristian Tartaro", "Lorenzo Moro"]
-        },
-        {
-          "casa": "Roma",
-          "ospite": "Torino",
-          "risultato": "0-0",
-          "fanta": ["Alex Beltrame"]
-        },
-        {
-          "casa": "Fiorentina",
-          "ospite": "Como",
-          "risultato": "0-0",
-          "fanta": ["Valentina Pozzi"]
-        }
+        { "casa": "Juve", "ospite": "Udinese", "risultato": "2-0" },
+        { "casa": "Atalanta", "ospite": "Genoa", "risultato": "4-0" },
+        { "casa": "Napoli", "ospite": "Cagliari", "risultato": "2-1" },
+        { "casa": "Inter", "ospite": "Venezia", "risultato": "5-1" },
+        { "casa": "Bologna", "ospite": "Parma", "risultato": "2-1" },
+        { "casa": "Lazio", "ospite": "Milan", "risultato": "1-0" },
+        { "casa": "Roma", "ospite": "Torino", "risultato": "1-0" },
+        { "casa": "Fiorentina", "ospite": "Como", "risultato": "1-0" }
       ]
     },
     "quarti": {
-      "date": "4 e 11 Febbraio 2026",
       "partite": [
-        {
-          "casa": "Atalanta",
-          "ospite": "Juventus",
-          "risultato": "Da giocare",
-          "fanta": ["Kevin Di Bernardo", "Denis Mascherin"]
-        },
-        {
-          "casa": "Inter",
-          "ospite": "Roma",
-          "risultato": "Da giocare",
-          "fanta": ["Federico Burello", "Alex Beltrame"]
-        },
-        {
-          "casa": "Bologna",
-          "ospite": "Lazio",
-          "risultato": "Da giocare",
-          "fanta": ["Nicola Marano", "Cristian Tartaro"]
-        },
-        {
-          "casa": "Fiorentina",
-          "ospite": "Napoli",
-          "risultato": "Da giocare",
-          "fanta": ["Valentina Pozzi", "Mattia Beltrame"]
-        }
+        { "casa": "Atalanta", "ospite": "Juve", "risultato": "Da giocare" },
+        { "casa": "Inter", "ospite": "Roma", "risultato": "Da giocare" },
+        { "casa": "Bologna", "ospite": "Lazio", "risultato": "Da giocare" },
+        { "casa": "Fiorentina", "ospite": "Napoli", "risultato": "Da giocare" }
       ]
     }
   },
-  "classificaFinale": "In attesa della finale del 13 Maggio 2026.",
-  "classificaFantallenatori": "Ranking basato sul progresso nel tabellone.",
-  "palmares": "2025/2026: 🏆 (IN CORSO)\n2024/2025: 🏆 BOLOGNA - FEDERICO BURELLO\n2023/2024: 🏆 JUVENTUS - DENIS MASCHERIN."
+  "palmares": "2024/25: 🏆 Bologna (F. Burello)\n2023/24: 🏆 Juventus (D. Mascherin)"
 }

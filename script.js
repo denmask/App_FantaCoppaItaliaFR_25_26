@@ -1,138 +1,152 @@
 let db = {};
-let filterS = 'all';
-let filterT = 'all';
 
 document.addEventListener("DOMContentLoaded", () => {
-    fetch("data.json")
-        .then(r => r.json())
-        .then(data => {
-            db = data;
-            
-            // Popola filtri squadre
-            const fDiv = document.getElementById("filtri-squadre");
-            data.squadreFanta.forEach(item => {
-                const b = document.createElement("button");
-                b.className = "btn-f";
-                b.dataset.squadra = item.squadra;
-                b.innerHTML = `${item.squadra}<br><small>${item.fantallenatore}</small>`;
-                fDiv.appendChild(b);
-            });
-
-            renderCal();
-            calcolaRanking();
-            document.getElementById("palmares").textContent = data.palmares;
-            setupEvents();
-        });
+  fetch("data.json")
+    .then(r => r.json())
+    .then(data => {
+      db = data;
+      init();
+    });
 });
 
-function renderCal() {
-    const container = document.getElementById("contenuto-calendario");
-    const tFiltri = document.getElementById("filtri-turni");
-    container.innerHTML = "";
+function init() {
+  const select = document.getElementById("fanta-select");
 
-    for (const key in db.calendario) {
-        if(!tFiltri.querySelector(`[data-turno="${key}"]`)) {
-            const tb = document.createElement("button");
-            tb.className = "btn-t";
-            tb.dataset.turno = key;
-            tb.textContent = key.toUpperCase();
-            tFiltri.appendChild(tb);
-        }
+  // popolamento squadre
+  db.squadreFanta.forEach(s => {
+    const opt = document.createElement("option");
+    opt.value = s.squadra;
+    opt.textContent = `${s.fantallenatore} (${s.squadra})`;
+    select.appendChild(opt);
+  });
 
-        const turno = db.calendario[key];
-        const turnoDiv = document.createElement("div");
-        turnoDiv.className = `turno-container t-${key}`;
-        turnoDiv.innerHTML = `<h3 style="color:var(--coppa-red)">${key.toUpperCase()}</h3>`;
-
-        turno.partite.forEach(p => {
-            const card = document.createElement("div");
-            card.className = "match-card";
-            let cWin = "", oWin = "";
-            const s = p.risultato.split("-");
-            if(s.length === 2) {
-                if(parseInt(s[0]) > parseInt(s[1])) cWin = "squadra-win";
-                else if(parseInt(s[1]) > parseInt(s[0])) oWin = "squadra-win";
-            }
-
-            card.innerHTML = `
-                <div class="match-main">
-                    <div class="squadre-names">
-                        <span class="${cWin}">${p.casa}</span> vs <span class="${oWin}">${p.ospite}</span>
-                    </div>
-                    <div class="score-box">${p.risultato}</div>
-                </div>
-                <div class="fanta-info">Fanta: ${p.fanta.join(" & ")}</div>
-            `;
-            card.dataset.teams = `${p.casa} ${p.ospite} ${p.fanta.join(" ")}`;
-            turnoDiv.appendChild(card);
-        });
-        container.appendChild(turnoDiv);
+  // gestione filtri moderni con "tutti"
+  select.addEventListener("change", (event) => {
+    if (event.target.value === "all") {
+      const allSelected = select.options[0].selected;
+      for (let i = 1; i < select.options.length; i++) {
+        select.options[i].selected = false;
+      }
+      if (!allSelected) select.options[0].selected = true;
+    } else {
+      select.options[0].selected = false;
     }
-    applyFilters();
+
+    const selected = Array.from(select.selectedOptions).map(o => o.value);
+    filter(selected);
+  });
+
+  render();
+  updateRanking();
 }
 
-function calcolaRanking() {
-    const rankingDiv = document.getElementById("ranking-fanta");
-    rankingDiv.innerHTML = "";
-    
-    // Mappa per tracciare lo stato delle squadre (eliminata o no)
-    const status = {};
-    db.squadreFanta.forEach(s => status[s.squadra] = { fanta: s.fantallenatore, active: true });
+function render() {
+  const container = document.getElementById("calendario-live");
+  container.innerHTML = "";
 
-    // Analisi risultati calendario
+  for (const turno in db.calendario) {
+    const wrapper = document.createElement("div");
+
+    const title = document.createElement("h3");
+    title.className = "turno-title";
+    title.textContent = turno.toUpperCase();
+    wrapper.appendChild(title);
+
+    db.calendario[turno].partite.forEach(p => {
+      const card = document.createElement("div");
+      card.className = "match-card";
+      card.dataset.teams = `${p.casa} ${p.ospite}`;
+
+      let winnerText = "Da giocare";
+      if (p.risultato && p.risultato.includes("-")) {
+        const [gCasa, gOspite] = p.risultato.split("-").map(n => parseInt(n));
+        if (!isNaN(gCasa) && !isNaN(gOspite)) {
+          if (gCasa > gOspite) winnerText = `Ha vinto ${p.casa}`;
+          else if (gOspite > gCasa) winnerText = `Ha vinto ${p.ospite}`;
+          else winnerText = "Pareggio";
+        }
+      }
+
+      card.innerHTML = `
+        <div>
+          <div><strong>${p.casa}</strong> vs <strong>${p.ospite}</strong></div>
+          <div class="winner-text">${winnerText}</div>
+        </div>
+        <div class="score">${p.risultato}</div>
+      `;
+
+      wrapper.appendChild(card);
+    });
+
+    container.appendChild(wrapper);
+  }
+
+  document.getElementById("palmares-box").textContent = db.palmares;
+}
+
+function updateRanking() {
+  const container = document.getElementById("ranking-container");
+  const weights = { "ottavi": 1, "quarti": 2, "semifinali": 3, "finale": 4 };
+
+  let ranking = db.squadreFanta.map(s => {
+    let maxTurno = "Nessuno";
+    let weight = 0;
+    let eliminated = false;
+
     for (const turno in db.calendario) {
-        db.calendario[turno].partite.forEach(p => {
-            const r = p.risultato.split("-");
-            if(r.length === 2) {
-                const gC = parseInt(r[0]);
-                const gO = parseInt(r[1]);
-                if(gC > gO) status[p.ospite] ? status[p.ospite].active = false : null;
-                else if(gO > gC) status[p.casa] ? status[p.casa].active = false : null;
+      db.calendario[turno].partite.forEach(p => {
+        if (p.casa === s.squadra || p.ospite === s.squadra) {
+          if (weights[turno] >= weight) {
+            maxTurno = turno;
+            weight = weights[turno];
+          }
+
+          const res = p.risultato.split("-");
+          if (res.length === 2) {
+            const scoreCasa = parseInt(res[0]);
+            const scoreOspite = parseInt(res[1]);
+
+            if (
+              (p.casa === s.squadra && scoreOspite > scoreCasa) ||
+              (p.ospite === s.squadra && scoreCasa > scoreOspite)
+            ) {
+              eliminated = true;
             }
-        });
+          }
+        }
+      });
     }
 
-    // Rendering lista
-    Object.keys(status).forEach(sq => {
-        const item = document.createElement("div");
-        item.className = "ranking-item";
-        const info = status[sq];
-        item.innerHTML = `
-            <span class="${info.active ? 'status-in' : 'status-out'}">${sq} (${info.fanta})</span>
-            <span>${info.active ? 'IN GARA' : 'ELIMINATO'}</span>
-        `;
-        rankingDiv.appendChild(item);
-    });
+    return { ...s, maxTurno, weight, eliminated };
+  });
+
+  // Ordinamento: per turno raggiunto, poi per stato "in gara"
+  ranking.sort((a, b) => b.weight - a.weight || a.eliminated - b.eliminated);
+
+  container.innerHTML = ranking.map((r, index) => {
+    const posizione = index + 1;
+    const statusText = r.eliminated
+      ? `Uscito ai ${r.maxTurno}`
+      : `In gara (${r.maxTurno})`;
+    const badgeClass = r.eliminated ? "eliminato" : "in-gara";
+
+    return `
+      <div class="ranking-row">
+        <div>
+          <span class="rank-name">${posizione}. ${r.fantallenatore} (${r.squadra})</span>
+        </div>
+        <div class="rank-badge ${badgeClass}">
+          ${statusText}
+        </div>
+      </div>
+    `;
+  }).join("");
 }
 
-function setupEvents() {
-    document.addEventListener("click", e => {
-        const btnF = e.target.closest(".btn-f");
-        const btnT = e.target.closest(".btn-t");
-        if(btnF) {
-            document.querySelectorAll(".btn-f").forEach(x => x.classList.remove("btn-active"));
-            btnF.classList.add("btn-active");
-            filterS = btnF.dataset.squadra;
-            applyFilters();
-        }
-        if(btnT) {
-            document.querySelectorAll(".btn-t").forEach(x => x.classList.remove("btn-active"));
-            btnT.classList.add("btn-active");
-            filterT = btnT.dataset.turno;
-            applyFilters();
-        }
-    });
-}
-
-function applyFilters() {
-    document.querySelectorAll(".turno-container").forEach(t => {
-        const isTMatch = filterT === 'all' || t.classList.contains(`t-${filterT}`);
-        let hasM = false;
-        t.querySelectorAll(".match-card").forEach(m => {
-            const isSMatch = filterS === 'all' || m.dataset.teams.includes(filterS);
-            if(isTMatch && isSMatch) { m.style.display = "flex"; hasM = true; }
-            else { m.style.display = "none"; }
-        });
-        t.style.display = hasM ? "block" : "none";
-    });
+function filter(selected) {
+  document.querySelectorAll(".match-card").forEach(c => {
+    const isAll = selected.includes("all") || selected.length === 0;
+    const match = selected.some(s => c.dataset.teams.includes(s));
+    c.style.display = (isAll || match) ? "flex" : "none";
+  });
 }

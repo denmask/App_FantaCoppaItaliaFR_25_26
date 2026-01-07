@@ -1,53 +1,41 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fantacoppa Frecciarossa</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <title>Fantacoppa Italia Frecciarossa</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-    <header>
-        <div class="logo-area">
-            <h1>Fantacoppa Italia</h1>
-            <div class="freccia-text">Frecciarossa</div>
-        </div>
-    </header>
+  <header>
+    <div class="tricolore-bar"></div>
+    <h1>Fantacoppa Italia <span class="freccia-brand">Frecciarossa</span></h1>
+  </header>
 
-    <main>
-        <section id="filtri">
-            <div class="filter-group">
-                <h3>🔍 Filtra Squadra</h3>
-                <div id="filtri-squadre" class="scroll-x">
-                    <button class="btn-f btn-active" data-squadra="all">Tutte</button>
-                </div>
-            </div>
-            <div class="filter-group">
-                <h3>📅 Turno</h3>
-                <div id="filtri-turni" class="scroll-x">
-                    <button class="btn-t btn-active" data-turno="all">Tutti</button>
-                </div>
-            </div>
-        </section>
+  <main>
+    <section>
+      <h2 class="title-green">Seleziona fantallenatori</h2>
+      <p>Puoi filtrare per uno o più giocatori oppure mostrare tutti.</p>
+      <select id="fanta-select" multiple>
+        <option value="all">Tutti i giocatori</option>
+      </select>
+    </section>
 
-        <section id="calendario-container">
-            <div id="contenuto-calendario"></div>
-        </section>
+    <section>
+      <h2 class="title-green">Calendario live</h2>
+      <div id="calendario-live"></div>
+    </section>
 
-        <section id="classifiche-auto">
-            <div class="grid-stats">
-                <div class="stat-card">
-                    <h4>📊 Ranking Fantallenatori (Auto)</h4>
-                    <div id="ranking-fanta" class="ranking-list"></div>
-                </div>
-                <div class="stat-card">
-                    <h4>🏆 Albo d'Oro</h4>
-                    <pre id="palmares" class="box-data"></pre>
-                </div>
-            </div>
-        </section>
-    </main>
+    <section>
+      <h2 class="title-red">Classifica avanzamento</h2>
+      <div id="ranking-container"></div>
+    </section>
 
-    <script src="script.js"></script>
+    <section>
+      <h2 class="title-green">Albo d'oro</h2>
+      <div id="palmares-box"></div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
 </body>
 </html>
