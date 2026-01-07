@@ -10,35 +10,84 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function init() {
-  const select = document.getElementById("fanta-select");
+  buildFilters();   // checkbox
+  render();         // calendario
+  updateRanking();  // classifica
+}
 
-  // popolamento squadre
-  db.squadreFanta.forEach(s => {
-    const opt = document.createElement("option");
-    opt.value = s.squadra;
-    opt.textContent = `${s.fantallenatore} (${s.squadra})`;
-    select.appendChild(opt);
+// ---- FILTRI CON CHECKBOX ----
+
+function buildFilters() {
+  const container = document.getElementById("filter-container");
+
+  // checkbox "Tutti"
+  const allDiv = document.createElement("div");
+  allDiv.className = "filter-item";
+  allDiv.innerHTML = `
+    <input type="checkbox" id="chk-all" checked>
+    <label for="chk-all"><strong>Tutti</strong></label>
+  `;
+  container.appendChild(allDiv);
+
+  // checkbox per ogni fantallenatore/squadra
+  db.squadreFanta.forEach((s, index) => {
+    const id = `chk-${index}`;
+    const div = document.createElement("div");
+    div.className = "filter-item";
+    div.innerHTML = `
+      <input type="checkbox" id="${id}" data-squadra="${s.squadra}" checked>
+      <label for="${id}">${s.fantallenatore} (${s.squadra})</label>
+    `;
+    container.appendChild(div);
   });
 
-  // gestione filtri moderni con "tutti"
-  select.addEventListener("change", (event) => {
-    if (event.target.value === "all") {
-      const allSelected = select.options[0].selected;
-      for (let i = 1; i < select.options.length; i++) {
-        select.options[i].selected = false;
-      }
-      if (!allSelected) select.options[0].selected = true;
+  // logica "tutti" / singoli
+  container.addEventListener("change", (event) => {
+    const target = event.target;
+
+    if (target.id === "chk-all") {
+      const allChecked = target.checked;
+      container.querySelectorAll('input[type="checkbox"]').forEach(chk => {
+        chk.checked = allChecked;
+      });
     } else {
-      select.options[0].selected = false;
+      // se tocco un singolo, disattivo "tutti"
+      const chkAll = document.getElementById("chk-all");
+      chkAll.checked = false;
+
+      const checkboxes = Array.from(
+        container.querySelectorAll('input[type="checkbox"]')
+      ).filter(chk => chk.id !== "chk-all");
+
+      const allSinglesChecked = checkboxes.every(chk => chk.checked);
+      if (allSinglesChecked) {
+        chkAll.checked = true;
+      }
     }
 
-    const selected = Array.from(select.selectedOptions).map(o => o.value);
-    filter(selected);
+    applyFilterFromCheckbox();
   });
-
-  render();
-  updateRanking();
 }
+
+function applyFilterFromCheckbox() {
+  const container = document.getElementById("filter-container");
+  const chkAll = document.getElementById("chk-all");
+
+  let selectedTeams = [];
+
+  if (chkAll.checked) {
+    // tutti selezionati
+    selectedTeams = db.squadreFanta.map(s => s.squadra);
+  } else {
+    selectedTeams = Array.from(
+      container.querySelectorAll('input[type="checkbox"][data-squadra]:checked')
+    ).map(chk => chk.dataset.squadra);
+  }
+
+  filter(selectedTeams);
+}
+
+// ---- RENDER CALENDARIO + VINCITORE ----
 
 function render() {
   const container = document.getElementById("calendario-live");
@@ -57,13 +106,23 @@ function render() {
       card.className = "match-card";
       card.dataset.teams = `${p.casa} ${p.ospite}`;
 
+      // trova fantallenatori delle due squadre
+      const fCasa = db.squadreFanta.find(s => s.squadra === p.casa);
+      const fOspite = db.squadreFanta.find(s => s.squadra === p.ospite);
+
       let winnerText = "Da giocare";
       if (p.risultato && p.risultato.includes("-")) {
         const [gCasa, gOspite] = p.risultato.split("-").map(n => parseInt(n));
         if (!isNaN(gCasa) && !isNaN(gOspite)) {
-          if (gCasa > gOspite) winnerText = `Ha vinto ${p.casa}`;
-          else if (gOspite > gCasa) winnerText = `Ha vinto ${p.ospite}`;
-          else winnerText = "Pareggio";
+          if (gCasa > gOspite) {
+            const nomeF = fCasa ? ` (${fCasa.fantallenatore})` : "";
+            winnerText = `Ha vinto ${p.casa}${nomeF}`;
+          } else if (gOspite > gCasa) {
+            const nomeF = fOspite ? ` (${fOspite.fantallenatore})` : "";
+            winnerText = `Ha vinto ${p.ospite}${nomeF}`;
+          } else {
+            winnerText = "Pareggio";
+          }
         }
       }
 
@@ -83,6 +142,8 @@ function render() {
 
   document.getElementById("palmares-box").textContent = db.palmares;
 }
+
+// ---- CLASSIFICA CON POSIZIONE ----
 
 function updateRanking() {
   const container = document.getElementById("ranking-container");
@@ -120,7 +181,6 @@ function updateRanking() {
     return { ...s, maxTurno, weight, eliminated };
   });
 
-  // Ordinamento: per turno raggiunto, poi per stato "in gara"
   ranking.sort((a, b) => b.weight - a.weight || a.eliminated - b.eliminated);
 
   container.innerHTML = ranking.map((r, index) => {
@@ -143,10 +203,15 @@ function updateRanking() {
   }).join("");
 }
 
-function filter(selected) {
+// ---- FILTRO MATCH IN BASE ALLE SQUADRE ----
+
+function filter(selectedTeams) {
   document.querySelectorAll(".match-card").forEach(c => {
-    const isAll = selected.includes("all") || selected.length === 0;
-    const match = selected.some(s => c.dataset.teams.includes(s));
-    c.style.display = (isAll || match) ? "flex" : "none";
+    if (selectedTeams.length === 0) {
+      c.style.display = "flex";
+      return;
+    }
+    const match = selectedTeams.some(s => c.dataset.teams.includes(s));
+    c.style.display = match ? "flex" : "none";
   });
 }

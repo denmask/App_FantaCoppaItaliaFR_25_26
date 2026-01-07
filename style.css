@@ -52,20 +52,27 @@ section {
   box-shadow: 0 10px 25px rgba(0,0,0,0.05);
 }
 
-/* Select */
+/* Select / Filtri */
 
-select {
-  width: 100%;
-  border: 2px solid var(--ita-green);
-  border-radius: 10px;
-  padding: 10px;
-  font-size: 1rem;
-  color: var(--ita-green);
+#filter-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin-top: 10px;
 }
 
-select option:checked {
-  background-color: var(--ita-green) !important;
-  color: white;
+.filter-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 20px;
+  background: #f1f3f5;
+  font-size: 0.9rem;
+}
+
+.filter-item input[type="checkbox"] {
+  accent-color: var(--ita-green);
 }
 
 /* Match Card */
