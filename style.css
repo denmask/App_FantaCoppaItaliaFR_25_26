@@ -181,3 +181,11 @@ section {
   border: 1px dashed #ccc;
   white-space: pre-line;
 }
+
+.team-name {
+  font-weight: 600;
+}
+
+.team-winner {
+  color: var(--ita-red);
+}

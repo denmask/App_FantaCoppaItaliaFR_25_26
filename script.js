@@ -51,7 +51,6 @@ function buildFilters() {
         chk.checked = allChecked;
       });
     } else {
-      // se tocco un singolo, disattivo "tutti"
       const chkAll = document.getElementById("chk-all");
       chkAll.checked = false;
 
@@ -76,7 +75,6 @@ function applyFilterFromCheckbox() {
   let selectedTeams = [];
 
   if (chkAll.checked) {
-    // tutti selezionati
     selectedTeams = db.squadreFanta.map(s => s.squadra);
   } else {
     selectedTeams = Array.from(
@@ -106,29 +104,39 @@ function render() {
       card.className = "match-card";
       card.dataset.teams = `${p.casa} ${p.ospite}`;
 
-      // trova fantallenatori delle due squadre
       const fCasa = db.squadreFanta.find(s => s.squadra === p.casa);
       const fOspite = db.squadreFanta.find(s => s.squadra === p.ospite);
 
       let winnerText = "Da giocare";
+      let winnerSide = null; // 'casa' | 'ospite'
+
       if (p.risultato && p.risultato.includes("-")) {
         const [gCasa, gOspite] = p.risultato.split("-").map(n => parseInt(n));
         if (!isNaN(gCasa) && !isNaN(gOspite)) {
           if (gCasa > gOspite) {
             const nomeF = fCasa ? ` (${fCasa.fantallenatore})` : "";
             winnerText = `Ha vinto ${p.casa}${nomeF}`;
+            winnerSide = "casa";
           } else if (gOspite > gCasa) {
             const nomeF = fOspite ? ` (${fOspite.fantallenatore})` : "";
             winnerText = `Ha vinto ${p.ospite}${nomeF}`;
+            winnerSide = "ospite";
           } else {
             winnerText = "Pareggio";
           }
         }
       }
 
+      const classCasa = winnerSide === "casa" ? "team-name team-winner" : "team-name";
+      const classOspite = winnerSide === "ospite" ? "team-name team-winner" : "team-name";
+
       card.innerHTML = `
         <div>
-          <div><strong>${p.casa}</strong> vs <strong>${p.ospite}</strong></div>
+          <div>
+            <span class="${classCasa}">${p.casa}</span>
+            &nbsp;vs&nbsp;
+            <span class="${classOspite}">${p.ospite}</span>
+          </div>
           <div class="winner-text">${winnerText}</div>
         </div>
         <div class="score">${p.risultato}</div>
@@ -143,7 +151,7 @@ function render() {
   document.getElementById("palmares-box").textContent = db.palmares;
 }
 
-// ---- CLASSIFICA CON POSIZIONE ----
+// ---- CLASSIFICA CON POSIZIONE E VITTORIA FINALE ----
 
 function updateRanking() {
   const container = document.getElementById("ranking-container");
@@ -163,7 +171,7 @@ function updateRanking() {
           }
 
           const res = p.risultato.split("-");
-          if (res.length === 2) {
+          if (res.length === 2 && res[0] !== "Da giocare") {
             const scoreCasa = parseInt(res[0]);
             const scoreOspite = parseInt(res[1]);
 
@@ -185,9 +193,16 @@ function updateRanking() {
 
   container.innerHTML = ranking.map((r, index) => {
     const posizione = index + 1;
-    const statusText = r.eliminated
-      ? `Uscito ai ${r.maxTurno}`
-      : `In gara (${r.maxTurno})`;
+
+    let statusText;
+    if (r.maxTurno === "finale" && !r.eliminated) {
+      statusText = "Vittoria finale";
+    } else if (r.eliminated) {
+      statusText = `Uscito ai ${r.maxTurno}`;
+    } else {
+      statusText = `In gara (${r.maxTurno})`;
+    }
+
     const badgeClass = r.eliminated ? "eliminato" : "in-gara";
 
     return `
@@ -207,7 +222,7 @@ function updateRanking() {
 
 function filter(selectedTeams) {
   document.querySelectorAll(".match-card").forEach(c => {
-    if (selectedTeams.length === 0) {
+    if (!selectedTeams || selectedTeams.length === 0) {
       c.style.display = "flex";
       return;
     }

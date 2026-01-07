@@ -21,8 +21,8 @@
         { "casa": "Inter", "ospite": "Venezia", "risultato": "5-1" },
         { "casa": "Bologna", "ospite": "Parma", "risultato": "2-1" },
         { "casa": "Lazio", "ospite": "Milan", "risultato": "1-0" },
-        { "casa": "Roma", "ospite": "Torino", "risultato": "1-0" },
-        { "casa": "Fiorentina", "ospite": "Como", "risultato": "1-0" }
+        { "casa": "Roma", "ospite": "Torino", "risultato": "Da giocare" },
+        { "casa": "Fiorentina", "ospite": "Como", "risultato": "Da giocare" }
       ]
     },
     "quarti": {
