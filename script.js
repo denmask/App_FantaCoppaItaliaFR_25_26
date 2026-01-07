@@ -6,42 +6,47 @@ document.addEventListener("DOMContentLoaded", () => {
     .then((data) => {
       db = data;
       init();
+    })
+    .catch((err) => {
+      console.error("Errore nel caricamento dei dati:", err);
+      document.getElementById("calendario-live").innerHTML =
+        '<p style="color: #cd212a; font-weight: 600;">Errore nel caricamento dei dati del torneo.</p>';
     });
 });
 
 function init() {
-  buildFilters(); // checkbox
-  render(); // calendario
-  updateRanking(); // classifica
+  buildFilters();
+  renderCalendar();
+  updateRanking();
 }
 
-// ---- FILTRI CON CHECKBOX ----
+// ========== FILTRI ==========
 
 function buildFilters() {
   const container = document.getElementById("filter-container");
 
-  // checkbox "Tutti"
+  // Checkbox "Tutti"
   const allDiv = document.createElement("div");
   allDiv.className = "filter-item";
   allDiv.innerHTML = `
     <input type="checkbox" id="chk-all" checked>
-    <label for="chk-all"><strong>Tutti</strong></label>
+    <label for="chk-all"><strong>✨ Tutti</strong></label>
   `;
   container.appendChild(allDiv);
 
-  // checkbox per ogni fantallenatore/squadra
+  // Checkbox per ogni fantallenatore
   db.squadreFanta.forEach((s, index) => {
     const id = `chk-${index}`;
     const div = document.createElement("div");
     div.className = "filter-item";
     div.innerHTML = `
       <input type="checkbox" id="${id}" data-squadra="${s.squadra}" checked>
-      <label for="${id}">${s.fantallenatore} (${s.squadra})</label>
+      <label for="${id}">${s.fantallenatore}<br><small>(${s.squadra})</small></label>
     `;
     container.appendChild(div);
   });
 
-  // logica "tutti" / singoli
+  // Gestione cambiamento checkbox
   container.addEventListener("change", (event) => {
     const target = event.target;
 
@@ -51,17 +56,12 @@ function buildFilters() {
         chk.checked = allChecked;
       });
     } else {
-      const chkAll = document.getElementById("chk-all");
-      chkAll.checked = false;
-
       const checkboxes = Array.from(
         container.querySelectorAll('input[type="checkbox"]')
       ).filter((chk) => chk.id !== "chk-all");
 
       const allSinglesChecked = checkboxes.every((chk) => chk.checked);
-      if (allSinglesChecked) {
-        chkAll.checked = true;
-      }
+      document.getElementById("chk-all").checked = allSinglesChecked;
     }
 
     applyFilterFromCheckbox();
@@ -82,12 +82,12 @@ function applyFilterFromCheckbox() {
     ).map((chk) => chk.dataset.squadra);
   }
 
-  filter(selectedTeams);
+  filterMatches(selectedTeams);
 }
 
-// ---- RENDER CALENDARIO + VINCITORE ----
+// ========== CALENDARIO ==========
 
-function render() {
+function renderCalendar() {
   const container = document.getElementById("calendario-live");
   container.innerHTML = "";
 
@@ -100,60 +100,126 @@ function render() {
     wrapper.appendChild(title);
 
     db.calendario[turno].partite.forEach((p) => {
-      const card = document.createElement("div");
-      card.className = "match-card";
-      card.dataset.teams = `${p.casa} ${p.ospite}`;
-
-      const fCasa = db.squadreFanta.find((s) => s.squadra === p.casa);
-      const fOspite = db.squadreFanta.find((s) => s.squadra === p.ospite);
-
-      let winnerText = "Da giocare";
-      let winnerSide = null; // 'casa' | 'ospite'
-
-      if (p.risultato && p.risultato.includes("-")) {
-        const [gCasa, gOspite] = p.risultato.split("-").map((n) => parseInt(n));
-        if (!isNaN(gCasa) && !isNaN(gOspite)) {
-          if (gCasa > gOspite) {
-            const nomeF = fCasa ? ` (${fCasa.fantallenatore})` : "";
-            winnerText = `Ha vinto ${p.casa}${nomeF}`;
-            winnerSide = "casa";
-          } else if (gOspite > gCasa) {
-            const nomeF = fOspite ? ` (${fOspite.fantallenatore})` : "";
-            winnerText = `Ha vinto ${p.ospite}${nomeF}`;
-            winnerSide = "ospite";
-          } else {
-            winnerText = "Pareggio";
-          }
-        }
-      }
-
-      const classCasa =
-        winnerSide === "casa" ? "team-name team-winner" : "team-name";
-      const classOspite =
-        winnerSide === "ospite" ? "team-name team-winner" : "team-name";
-
-      card.innerHTML = `
-        <div>
-          <div>
-            <span class="${classCasa}">${p.casa}</span>
-            &nbsp;vs&nbsp;
-            <span class="${classOspite}">${p.ospite}</span>
-          </div>
-          <div class="winner-text">${winnerText}</div>
-        </div>
-        <div class="score">${p.risultato}</div>
-      `;
-
+      const card = createMatchCard(p);
       wrapper.appendChild(card);
     });
 
     container.appendChild(wrapper);
   }
 
+  // Palmares
   document.getElementById("palmares-box").textContent = db.palmares;
 }
 
-// ---- CLASSIFICA CON POSIZIONE E VITTORIA FINALE ----
+function createMatchCard(partita) {
+  const card = document.createElement("div");
+  card.className = "match-card";
+  card.dataset.teams = `${partita.casa} ${partita.ospite}`;
+
+  const fCasa = db.squadreFanta.find((s) => s.squadra === partita.casa);
+  const fOspite = db.squadreFanta.find((s) => s.squadra === partita.ospite);
+
+  const matchResult = analyzeMatch(partita);
+
+  const casaClass =
+    matchResult.winner === "casa" ? "team-name team-winner" : "team-name";
+  const ospiteClass =
+    matchResult.winner === "ospite" ? "team-name team-winner" : "team-name";
+
+  let winnerHTML = `<div class="winner-text">${matchResult.text}</div>`;
+
+  if (matchResult.penalties) {
+    winnerHTML = `
+      <div class="winner-text">${matchResult.text}</div>
+      <div class="winner-text penalties">🎯 Rigori: ${partita.rigori}</div>
+    `;
+  }
+
+  const scoreHTML = matchResult.penalties
+    ? `
+      <div class="score-container">
+        <div class="score">${partita.risultato}</div>
+        <div class="penalties-score">RIG ${partita.rigori}</div>
+      </div>
+    `
+    : `
+      <div class="score-container">
+        <div class="score">${partita.risultato}</div>
+      </div>
+    `;
+
+  card.innerHTML = `
+    <div class="match-info">
+      <div class="match-teams">
+        <span class="${casaClass}">${partita.casa}</span>
+        <span class="vs-text">vs</span>
+        <span class="${ospiteClass}">${partita.ospite}</span>
+      </div>
+      ${winnerHTML}
+    </div>
+    ${scoreHTML}
+  `;
+
+  return card;
+}
+
+function analyzeMatch(partita) {
+  if (!partita.risultato || partita.risultato === "Da giocare") {
+    return { winner: null, text: "🕐 Da giocare", penalties: false };
+  }
+
+  const [gCasa, gOspite] = partita.risultato.split("-").map((n) => parseInt(n));
+
+  if (isNaN(gCasa) || isNaN(gOspite)) {
+    return { winner: null, text: "Da giocare", penalties: false };
+  }
+
+  // Verifica rigori
+  if (partita.rigori) {
+    const [rCasa, rOspite] = partita.rigori.split("-").map((n) => parseInt(n));
+    const fCasa = db.squadreFanta.find((s) => s.squadra === partita.casa);
+    const fOspite = db.squadreFanta.find((s) => s.squadra === partita.ospite);
+
+    if (rCasa > rOspite) {
+      const nome = fCasa ? ` (${fCasa.fantallenatore})` : "";
+      return {
+        winner: "casa",
+        text: `🏆 Vittoria ai rigori: ${partita.casa}${nome}`,
+        penalties: true,
+      };
+    } else {
+      const nome = fOspite ? ` (${fOspite.fantallenatore})` : "";
+      return {
+        winner: "ospite",
+        text: `🏆 Vittoria ai rigori: ${partita.ospite}${nome}`,
+        penalties: true,
+      };
+    }
+  }
+
+  // Vittoria normale
+  if (gCasa > gOspite) {
+    const fCasa = db.squadreFanta.find((s) => s.squadra === partita.casa);
+    const nome = fCasa ? ` (${fCasa.fantallenatore})` : "";
+    return {
+      winner: "casa",
+      text: `🏆 Ha vinto ${partita.casa}${nome}`,
+      penalties: false,
+    };
+  } else if (gOspite > gCasa) {
+    const fOspite = db.squadreFanta.find((s) => s.squadra === partita.ospite);
+    const nome = fOspite ? ` (${fOspite.fantallenatore})` : "";
+    return {
+      winner: "ospite",
+      text: `🏆 Ha vinto ${partita.ospite}${nome}`,
+      penalties: false,
+    };
+  } else {
+    return { winner: null, text: "⚖️ Pareggio", penalties: false };
+  }
+}
+
+// ========== CLASSIFICA ==========
 
 function updateRanking() {
   const container = document.getElementById("ranking-container");
@@ -163,6 +229,8 @@ function updateRanking() {
     let maxTurno = "Nessuno";
     let weight = 0;
     let eliminated = false;
+    let wonByPenalties = false;
+    let totalGoals = 0;
 
     for (const turno in db.calendario) {
       db.calendario[turno].partite.forEach((p) => {
@@ -177,60 +245,113 @@ function updateRanking() {
             const scoreCasa = parseInt(res[0]);
             const scoreOspite = parseInt(res[1]);
 
-            if (
-              (p.casa === s.squadra && scoreOspite > scoreCasa) ||
-              (p.ospite === s.squadra && scoreCasa > scoreOspite)
-            ) {
-              eliminated = true;
+            if (!isNaN(scoreCasa) && !isNaN(scoreOspite)) {
+              // Calcola gol totali
+              if (p.casa === s.squadra) {
+                totalGoals += scoreCasa;
+              } else {
+                totalGoals += scoreOspite;
+              }
+
+              // Verifica eliminazione
+              let isEliminated = false;
+
+              if (p.rigori) {
+                const [rCasa, rOspite] = p.rigori
+                  .split("-")
+                  .map((n) => parseInt(n));
+                if (p.casa === s.squadra && rOspite > rCasa) {
+                  isEliminated = true;
+                } else if (p.ospite === s.squadra && rCasa > rOspite) {
+                  isEliminated = true;
+                } else if (p.casa === s.squadra && rCasa > rOspite) {
+                  wonByPenalties = true;
+                  totalGoals += 1; // Bonus vittoria rigori
+                } else if (p.ospite === s.squadra && rOspite > rCasa) {
+                  wonByPenalties = true;
+                  totalGoals += 1; // Bonus vittoria rigori
+                }
+              } else {
+                if (
+                  (p.casa === s.squadra && scoreOspite > scoreCasa) ||
+                  (p.ospite === s.squadra && scoreCasa > scoreOspite)
+                ) {
+                  isEliminated = true;
+                }
+              }
+
+              if (isEliminated) {
+                eliminated = true;
+              }
             }
           }
         }
       });
     }
 
-    return { ...s, maxTurno, weight, eliminated };
+    return {
+      ...s,
+      maxTurno,
+      weight,
+      eliminated,
+      wonByPenalties,
+      totalGoals,
+    };
   });
 
-  ranking.sort((a, b) => b.weight - a.weight || a.eliminated - b.eliminated);
+  // Ordinamento: peso turno, poi gol totali (con bonus rigori)
+  ranking.sort((a, b) => {
+    if (b.weight !== a.weight) return b.weight - a.weight;
+    if (a.eliminated !== b.eliminated) return a.eliminated - b.eliminated;
+    return b.totalGoals - a.totalGoals;
+  });
 
   container.innerHTML = ranking
     .map((r, index) => {
       const posizione = index + 1;
 
       let statusText;
+      let badgeClass;
+
       if (r.maxTurno === "finale" && !r.eliminated) {
-        statusText = "Vittoria finale";
+        statusText = "🏆 Vittoria finale";
+        badgeClass = "vittoria-finale";
       } else if (r.eliminated) {
-        statusText = `Uscito ai ${r.maxTurno}`;
+        statusText = `❌ Uscito ai ${r.maxTurno}`;
+        badgeClass = "eliminato";
       } else {
-        statusText = `In gara (${r.maxTurno})`;
+        statusText = `✅ In gara (${r.maxTurno})`;
+        badgeClass = "in-gara";
       }
 
-      const badgeClass = r.eliminated ? "eliminato" : "in-gara";
-
       return `
-      <div class="ranking-row">
-        <div>
-          <span class="rank-name">${posizione}. ${r.fantallenatore} (${r.squadra})</span>
+        <div class="ranking-row">
+          <div class="rank-info">
+            <span class="rank-position">${posizione}</span>
+            <span class="rank-name">${r.fantallenatore} (${r.squadra})</span>
+          </div>
+          <div class="rank-badge ${badgeClass}">
+            ${statusText}
+          </div>
         </div>
-        <div class="rank-badge ${badgeClass}">
-          ${statusText}
-        </div>
-      </div>
-    `;
+      `;
     })
     .join("");
 }
 
-// ---- FILTRO MATCH IN BASE ALLE SQUADRE ----
+// ========== FILTRO VISIBILITÀ ==========
 
-function filter(selectedTeams) {
-  document.querySelectorAll(".match-card").forEach((c) => {
+function filterMatches(selectedTeams) {
+  document.querySelectorAll(".match-card").forEach((card) => {
     if (!selectedTeams || selectedTeams.length === 0) {
-      c.style.display = "flex";
+      card.style.display = "flex";
       return;
     }
-    const match = selectedTeams.some((s) => c.dataset.teams.includes(s));
-    c.style.display = match ? "flex" : "none";
+
+    const hasMatch = selectedTeams.some((team) =>
+      card.dataset.teams.includes(team)
+    );
+
+    card.style.display = hasMatch ? "flex" : "none";
   });
 }

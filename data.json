@@ -17,7 +17,12 @@
       "partite": [
         { "casa": "Juve", "ospite": "Udinese", "risultato": "2-0" },
         { "casa": "Atalanta", "ospite": "Genoa", "risultato": "4-0" },
-        { "casa": "Napoli", "ospite": "Cagliari", "risultato": "2-1" },
+        {
+          "casa": "Napoli",
+          "ospite": "Cagliari",
+          "risultato": "1-1",
+          "rigori": "10-9"
+        },
         { "casa": "Inter", "ospite": "Venezia", "risultato": "5-1" },
         { "casa": "Bologna", "ospite": "Parma", "risultato": "2-1" },
         { "casa": "Lazio", "ospite": "Milan", "risultato": "1-0" },
