@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
     })
     .catch((err) => {
       console.error("Errore nel caricamento dei dati:", err);
-      document.getElementById("calendario-live").innerHTML =
+      document.getElementById("calendario-live").innerHTML = 
         '<p style="color: #cd212a; font-weight: 600;">Errore nel caricamento dei dati del torneo.</p>';
     });
 });
@@ -121,13 +121,11 @@ function createMatchCard(partita) {
 
   const matchResult = analyzeMatch(partita);
 
-  const casaClass =
-    matchResult.winner === "casa" ? "team-name team-winner" : "team-name";
-  const ospiteClass =
-    matchResult.winner === "ospite" ? "team-name team-winner" : "team-name";
+  const casaClass = matchResult.winner === "casa" ? "team-name team-winner" : "team-name";
+  const ospiteClass = matchResult.winner === "ospite" ? "team-name team-winner" : "team-name";
 
   let winnerHTML = `<div class="winner-text">${matchResult.text}</div>`;
-
+  
   if (matchResult.penalties) {
     winnerHTML = `
       <div class="winner-text">${matchResult.text}</div>
@@ -135,7 +133,7 @@ function createMatchCard(partita) {
     `;
   }
 
-  const scoreHTML = matchResult.penalties
+  const scoreHTML = matchResult.penalties 
     ? `
       <div class="score-container">
         <div class="score">${partita.risultato}</div>
@@ -168,7 +166,7 @@ function analyzeMatch(partita) {
     return { winner: null, text: "🕐 Da giocare", penalties: false };
   }
 
-  const [gCasa, gOspite] = partita.risultato.split("-").map((n) => parseInt(n));
+  const [gCasa, gOspite] = partita.risultato.split("-").map(n => parseInt(n));
 
   if (isNaN(gCasa) || isNaN(gOspite)) {
     return { winner: null, text: "Da giocare", penalties: false };
@@ -176,44 +174,36 @@ function analyzeMatch(partita) {
 
   // Verifica rigori
   if (partita.rigori) {
-    const [rCasa, rOspite] = partita.rigori.split("-").map((n) => parseInt(n));
-    const fCasa = db.squadreFanta.find((s) => s.squadra === partita.casa);
-    const fOspite = db.squadreFanta.find((s) => s.squadra === partita.ospite);
-
+    const [rCasa, rOspite] = partita.rigori.split("-").map(n => parseInt(n));
+    const fCasa = db.squadreFanta.find(s => s.squadra === partita.casa);
+    const fOspite = db.squadreFanta.find(s => s.squadra === partita.ospite);
+    
     if (rCasa > rOspite) {
       const nome = fCasa ? ` (${fCasa.fantallenatore})` : "";
-      return {
-        winner: "casa",
-        text: `🏆 Vittoria ai rigori: ${partita.casa}${nome}`,
-        penalties: true,
+      return { 
+        winner: "casa", 
+        text: `🏆 Vittoria ai rigori: ${partita.casa}${nome}`, 
+        penalties: true 
       };
     } else {
       const nome = fOspite ? ` (${fOspite.fantallenatore})` : "";
-      return {
-        winner: "ospite",
-        text: `🏆 Vittoria ai rigori: ${partita.ospite}${nome}`,
-        penalties: true,
+      return { 
+        winner: "ospite", 
+        text: `🏆 Vittoria ai rigori: ${partita.ospite}${nome}`, 
+        penalties: true 
       };
     }
   }
 
   // Vittoria normale
   if (gCasa > gOspite) {
-    const fCasa = db.squadreFanta.find((s) => s.squadra === partita.casa);
+    const fCasa = db.squadreFanta.find(s => s.squadra === partita.casa);
     const nome = fCasa ? ` (${fCasa.fantallenatore})` : "";
-    return {
-      winner: "casa",
-      text: `🏆 Ha vinto ${partita.casa}${nome}`,
-      penalties: false,
-    };
+    return { winner: "casa", text: `🏆 Ha vinto ${partita.casa}${nome}`, penalties: false };
   } else if (gOspite > gCasa) {
-    const fOspite = db.squadreFanta.find((s) => s.squadra === partita.ospite);
+    const fOspite = db.squadreFanta.find(s => s.squadra === partita.ospite);
     const nome = fOspite ? ` (${fOspite.fantallenatore})` : "";
-    return {
-      winner: "ospite",
-      text: `🏆 Ha vinto ${partita.ospite}${nome}`,
-      penalties: false,
-    };
+    return { winner: "ospite", text: `🏆 Ha vinto ${partita.ospite}${nome}`, penalties: false };
   } else {
     return { winner: null, text: "⚖️ Pareggio", penalties: false };
   }
@@ -246,32 +236,37 @@ function updateRanking() {
             const scoreOspite = parseInt(res[1]);
 
             if (!isNaN(scoreCasa) && !isNaN(scoreOspite)) {
-              // Calcola gol totali
-              if (p.casa === s.squadra) {
-                totalGoals += scoreCasa;
-              } else {
-                totalGoals += scoreOspite;
-              }
-
-              // Verifica eliminazione
+              // Verifica eliminazione e calcola gol
               let isEliminated = false;
-
+              
               if (p.rigori) {
-                const [rCasa, rOspite] = p.rigori
-                  .split("-")
-                  .map((n) => parseInt(n));
+                // Con rigori: conta solo gol partita + 1 se vinci ai rigori
+                if (p.casa === s.squadra) {
+                  totalGoals += scoreCasa;
+                } else {
+                  totalGoals += scoreOspite;
+                }
+                
+                const [rCasa, rOspite] = p.rigori.split("-").map(n => parseInt(n));
                 if (p.casa === s.squadra && rOspite > rCasa) {
                   isEliminated = true;
                 } else if (p.ospite === s.squadra && rCasa > rOspite) {
                   isEliminated = true;
                 } else if (p.casa === s.squadra && rCasa > rOspite) {
                   wonByPenalties = true;
-                  totalGoals += 1; // Bonus vittoria rigori
+                  totalGoals += 1; // Bonus vittoria rigori (NON i gol dei rigori)
                 } else if (p.ospite === s.squadra && rOspite > rCasa) {
                   wonByPenalties = true;
-                  totalGoals += 1; // Bonus vittoria rigori
+                  totalGoals += 1; // Bonus vittoria rigori (NON i gol dei rigori)
                 }
               } else {
+                // Senza rigori: conta tutti i gol normalmente
+                if (p.casa === s.squadra) {
+                  totalGoals += scoreCasa;
+                } else {
+                  totalGoals += scoreOspite;
+                }
+                
                 if (
                   (p.casa === s.squadra && scoreOspite > scoreCasa) ||
                   (p.ospite === s.squadra && scoreCasa > scoreOspite)
@@ -289,20 +284,25 @@ function updateRanking() {
       });
     }
 
-    return {
-      ...s,
-      maxTurno,
-      weight,
-      eliminated,
+    return { 
+      ...s, 
+      maxTurno, 
+      weight, 
+      eliminated, 
       wonByPenalties,
-      totalGoals,
+      totalGoals 
     };
   });
 
-  // Ordinamento: peso turno, poi gol totali (con bonus rigori)
+  // Ordinamento: peso turno, poi stato eliminazione, poi gol totali (solo a parità)
   ranking.sort((a, b) => {
+    // Prima: peso turno
     if (b.weight !== a.weight) return b.weight - a.weight;
+    
+    // Seconda: stato eliminazione
     if (a.eliminated !== b.eliminated) return a.eliminated - b.eliminated;
+    
+    // Terza: gol totali (solo se stesso turno E stesso stato)
     return b.totalGoals - a.totalGoals;
   });
 
@@ -347,11 +347,11 @@ function filterMatches(selectedTeams) {
       card.style.display = "flex";
       return;
     }
-
-    const hasMatch = selectedTeams.some((team) =>
+    
+    const hasMatch = selectedTeams.some((team) => 
       card.dataset.teams.includes(team)
     );
-
+    
     card.style.display = hasMatch ? "flex" : "none";
   });
 }
