@@ -17,26 +17,60 @@
       "partite": [
         { "casa": "Virtus Entella", "ospite": "Ternana", "risultato": "4-0" },
         { "casa": "Padova", "ospite": "Vicenza", "risultato": "0-2" },
-        { "casa": "Avellino", "ospite": "Audace Cerignola", "risultato": "0-1" },
+        {
+          "casa": "Avellino",
+          "ospite": "Audace Cerignola",
+          "risultato": "0-1"
+        },
         { "casa": "Pescara", "ospite": "Rimini", "risultato": "1-0" }
       ]
     },
     "trentaduesimi": {
       "partite": [
-        { "casa": "Empoli", "ospite": "Reggiana", "risultato": "4-1", "rigori": "dcr" },
+        {
+          "casa": "Empoli",
+          "ospite": "Reggiana",
+          "risultato": "4-1",
+          "rigori": "dcr"
+        },
         { "casa": "Sassuolo", "ospite": "Catanzaro", "risultato": "1-0" },
         { "casa": "Lecce", "ospite": "Juve Stabia", "risultato": "2-0" },
         { "casa": "Genoa", "ospite": "Vicenza", "risultato": "3-0" },
         { "casa": "Venezia", "ospite": "Mantova", "risultato": "4-0" },
         { "casa": "Como", "ospite": "Sudtirol", "risultato": "3-1" },
-        { "casa": "Cagliari", "ospite": "Virtus Entella", "risultato": "6-5", "rigori": "dcr" },
-        { "casa": "Cremonese", "ospite": "Palermo", "risultato": "4-5", "rigori": "dcr" },
+        {
+          "casa": "Cagliari",
+          "ospite": "Virtus Entella",
+          "risultato": "6-5",
+          "rigori": "dcr"
+        },
+        {
+          "casa": "Cremonese",
+          "ospite": "Palermo",
+          "risultato": "4-5",
+          "rigori": "dcr"
+        },
         { "casa": "Monza", "ospite": "Frosinone", "risultato": "0-1" },
         { "casa": "Parma", "ospite": "Pescara", "risultato": "2-0" },
-        { "casa": "Cesena", "ospite": "Pisa", "risultato": "1-2", "rigori": "dcr" },
+        {
+          "casa": "Cesena",
+          "ospite": "Pisa",
+          "risultato": "1-2",
+          "rigori": "dcr"
+        },
         { "casa": "Milan", "ospite": "Bari", "risultato": "2-0" },
-        { "casa": "Audace Cerignola", "ospite": "Hellas Verona", "risultato": "2-4", "rigori": "dcr" },
-        { "casa": "Spezia", "ospite": "Sampdoria", "risultato": "4-2", "rigori": "dcr" },
+        {
+          "casa": "Audace Cerignola",
+          "ospite": "Hellas Verona",
+          "risultato": "2-4",
+          "rigori": "dcr"
+        },
+        {
+          "casa": "Spezia",
+          "ospite": "Sampdoria",
+          "risultato": "4-2",
+          "rigori": "dcr"
+        },
         { "casa": "Udinese", "ospite": "Carrarese", "risultato": "2-0" },
         { "casa": "Torino", "ospite": "Modena", "risultato": "1-0" }
       ]
@@ -46,8 +80,18 @@
         { "casa": "Cagliari", "ospite": "Frosinone", "risultato": "4-1" },
         { "casa": "Udinese", "ospite": "Palermo", "risultato": "2-1" },
         { "casa": "Milan", "ospite": "Lecce", "risultato": "3-0" },
-        { "casa": "Parma", "ospite": "Spezia", "risultato": "3-2", "rigori": "dcr" },
-        { "casa": "Hellas Verona", "ospite": "Venezia", "risultato": "0-1", "rigori": "dcr" },
+        {
+          "casa": "Parma",
+          "ospite": "Spezia",
+          "risultato": "3-2",
+          "rigori": "dcr"
+        },
+        {
+          "casa": "Hellas Verona",
+          "ospite": "Venezia",
+          "risultato": "0-1",
+          "rigori": "dcr"
+        },
         { "casa": "Como", "ospite": "Sassuolo", "risultato": "3-0" },
         { "casa": "Genoa", "ospite": "Empoli", "risultato": "3-1" },
         { "casa": "Torino", "ospite": "Pisa", "risultato": "1-0" }
@@ -57,7 +101,12 @@
       "partite": [
         { "casa": "Juventus", "ospite": "Udinese", "risultato": "2-0" },
         { "casa": "Atalanta", "ospite": "Genoa", "risultato": "4-0" },
-        { "casa": "Napoli", "ospite": "Cagliari", "risultato": "1-1", "rigori": "10-9" },
+        {
+          "casa": "Napoli",
+          "ospite": "Cagliari",
+          "risultato": "1-1",
+          "rigori": "10-9"
+        },
         { "casa": "Inter", "ospite": "Venezia", "risultato": "5-1" },
         { "casa": "Bologna", "ospite": "Parma", "risultato": "2-1" },
         { "casa": "Lazio", "ospite": "Milan", "risultato": "1-0" },
@@ -70,7 +119,11 @@
         { "casa": "Atalanta", "ospite": "Juventus", "risultato": "Da giocare" },
         { "casa": "Bologna", "ospite": "Lazio", "risultato": "Da giocare" },
         { "casa": "Inter", "ospite": "Roma/Torino", "risultato": "Da giocare" },
-        { "casa": "Napoli", "ospite": "Fiorentina/Como", "risultato": "Da giocare" }
+        {
+          "casa": "Napoli",
+          "ospite": "Fiorentina/Como",
+          "risultato": "Da giocare"
+        }
       ]
     },
     "semifinali": {
