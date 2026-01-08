@@ -498,3 +498,24 @@ footer {
     justify-content: center;
   }
 }
+
+.team-name {
+  color: var(--text-primary);
+}
+
+.team-winner {
+  color: var(--ita-green);
+  font-weight: 800;
+}
+.score {
+  background: var(--ita-red);
+  color: white;
+  padding: 0.65rem 1.25rem;
+  border-radius: var(--radius-sm);
+  font-weight: 800;
+  font-size: clamp(1rem, 2.8vw, 1.2rem);
+  min-width: 75px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(205, 33, 42, 0.25);
+  letter-spacing: 1px;
+}

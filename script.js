@@ -110,50 +110,37 @@ function renderCalendar() {
   // Palmares
   document.getElementById("palmares-box").textContent = db.palmares;
 }
-
 function createMatchCard(partita) {
   const card = document.createElement("div");
   card.className = "match-card";
-  card.dataset.teams = `${partita.casa} ${partita.ospite}`;
+  card.dataset.teams = `${partita.casa},${partita.ospite}`;
 
   const fCasa = db.squadreFanta.find((s) => s.squadra === partita.casa);
   const fOspite = db.squadreFanta.find((s) => s.squadra === partita.ospite);
 
   const matchResult = analyzeMatch(partita);
 
-  const casaClass =
-    matchResult.winner === "casa" ? "team-name team-winner" : "team-name";
-  const ospiteClass =
-    matchResult.winner === "ospite" ? "team-name team-winner" : "team-name";
+  const casaClass = matchResult.winner === "casa" ? "team-name team-winner" : "team-name";
+  const ospiteClass = matchResult.winner === "ospite" ? "team-name team-winner" : "team-name";
 
   let winnerHTML = `<div class="winner-text">${matchResult.text}</div>`;
-
   if (matchResult.penalties) {
-    winnerHTML = `
-      <div class="winner-text">${matchResult.text}</div>
-      <div class="winner-text penalties">🎯 Rigori: ${partita.rigori}</div>
-    `;
+    winnerHTML = `<div class="winner-text penalties">${matchResult.text}</div>`;
   }
 
-  const scoreHTML = matchResult.penalties
-    ? `
-      <div class="score-container">
-        <div class="score">${partita.risultato}</div>
-        <div class="penalties-score">RIG ${partita.rigori}</div>
-      </div>
-    `
-    : `
-      <div class="score-container">
-        <div class="score">${partita.risultato}</div>
-      </div>
-    `;
+  const scoreHTML = partita.risultato && partita.risultato !== "Da giocare"
+    ? (matchResult.penalties
+        ? `<div class="score-container">
+             <div class="score">${partita.risultato}</div>
+             <div class="penalties-score">RIG ${partita.rigori}</div>
+           </div>`
+        : `<div class="score-container">
+             <div class="score">${partita.risultato}</div>
+           </div>`)
+    : "";
 
-  const casaName = fCasa
-    ? `${partita.casa} (${fCasa.fantallenatore})`
-    : partita.casa;
-  const ospiteName = fOspite
-    ? `${partita.ospite} (${fOspite.fantallenatore})`
-    : partita.ospite;
+  const casaName = fCasa ? `${partita.casa} (${fCasa.fantallenatore})` : partita.casa;
+  const ospiteName = fOspite ? `${partita.ospite} (${fOspite.fantallenatore})` : partita.ospite;
 
   card.innerHTML = `
     <div class="match-info">
@@ -169,6 +156,7 @@ function createMatchCard(partita) {
 
   return card;
 }
+
 
 function analyzeMatch(partita) {
   if (!partita.risultato || partita.risultato === "Da giocare") {
