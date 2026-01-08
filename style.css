@@ -519,3 +519,15 @@ footer {
   box-shadow: 0 4px 12px rgba(205, 33, 42, 0.25);
   letter-spacing: 1px;
 }
+
+.winner-text {
+  font-size: clamp(0.85rem, 2.3vw, 0.95rem);
+  color: var(--text-secondary);
+  font-weight: 500;
+  margin-top: 0.25rem;
+}
+
+.winner-text.penalties {
+  color: var(--text-secondary);
+  font-weight: 600;
+}
