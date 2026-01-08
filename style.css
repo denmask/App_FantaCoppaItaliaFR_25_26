@@ -165,6 +165,10 @@ section:hover {
   box-shadow: var(--shadow-sm);
 }
 
+.filter-item:hover small {
+  color: rgba(255, 255, 255, 0.95);
+}
+
 .filter-item input[type="checkbox"] {
   width: 18px;
   height: 18px;
@@ -180,6 +184,7 @@ section:hover {
 .filter-item small {
   color: var(--text-secondary);
   font-size: 0.85em;
+  transition: color 0.3s ease;
 }
 
 /* ========== CALENDARIO ========== */
@@ -492,16 +497,4 @@ footer {
     min-width: 130px;
     justify-content: center;
   }
-}
-
-.filter-item:hover {
-  background: var(--ita-green);
-  color: white;
-  border-color: var(--ita-green);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-sm);
-}
-
-.filter-item:hover small {
-  color: rgba(255, 255, 255, 0.9);
 }

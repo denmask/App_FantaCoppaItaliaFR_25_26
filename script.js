@@ -148,12 +148,19 @@ function createMatchCard(partita) {
       </div>
     `;
 
+  const casaName = fCasa
+    ? `${partita.casa} (${fCasa.fantallenatore})`
+    : partita.casa;
+  const ospiteName = fOspite
+    ? `${partita.ospite} (${fOspite.fantallenatore})`
+    : partita.ospite;
+
   card.innerHTML = `
     <div class="match-info">
       <div class="match-teams">
-        <span class="${casaClass}">${partita.casa}</span>
+        <span class="${casaClass}">${casaName}</span>
         <span class="vs-text">vs</span>
-        <span class="${ospiteClass}">${partita.ospite}</span>
+        <span class="${ospiteClass}">${ospiteName}</span>
       </div>
       ${winnerHTML}
     </div>
@@ -184,14 +191,14 @@ function analyzeMatch(partita) {
       const nome = fCasa ? ` (${fCasa.fantallenatore})` : "";
       return {
         winner: "casa",
-        text: `🏆 Vittoria ai rigori: ${partita.casa}${nome}`,
+        text: `🏆 Ha vinto ai rigori: ${partita.casa}${nome}`,
         penalties: true,
       };
     } else {
       const nome = fOspite ? ` (${fOspite.fantallenatore})` : "";
       return {
         winner: "ospite",
-        text: `🏆 Vittoria ai rigori: ${partita.ospite}${nome}`,
+        text: `🏆 Ha vinto ai rigori: ${partita.ospite}${nome}`,
         penalties: true,
       };
     }
@@ -266,10 +273,10 @@ function updateRanking() {
                   isEliminated = true;
                 } else if (p.casa === s.squadra && rCasa > rOspite) {
                   wonByPenalties = true;
-                  totalGoals += 1; // Bonus vittoria rigori (NON i gol dei rigori)
+                  totalGoals += 1;
                 } else if (p.ospite === s.squadra && rOspite > rCasa) {
                   wonByPenalties = true;
-                  totalGoals += 1; // Bonus vittoria rigori (NON i gol dei rigori)
+                  totalGoals += 1;
                 }
               } else {
                 // Senza rigori: conta tutti i gol normalmente
@@ -324,15 +331,27 @@ function updateRanking() {
 
       let statusText;
       let badgeClass;
+      let turnoText = r.maxTurno;
+
+      // Determina il testo del turno con preposizione corretta
+      if (r.maxTurno === "ottavi") {
+        turnoText = "agli ottavi";
+      } else if (r.maxTurno === "quarti") {
+        turnoText = "ai quarti";
+      } else if (r.maxTurno === "semifinali") {
+        turnoText = "in semifinale";
+      } else if (r.maxTurno === "finale") {
+        turnoText = "in finale";
+      }
 
       if (r.maxTurno === "finale" && !r.eliminated) {
-        statusText = "🏆 Vittoria finale";
+        statusText = "🏆 Vittoria";
         badgeClass = "vittoria-finale";
       } else if (r.eliminated) {
-        statusText = `❌ Uscito ai ${r.maxTurno}`;
+        statusText = `❌ Uscito ${turnoText}`;
         badgeClass = "eliminato";
       } else {
-        statusText = `✅ In gara (${r.maxTurno})`;
+        statusText = `✅ In gara (${turnoText})`;
         badgeClass = "in-gara";
       }
 
