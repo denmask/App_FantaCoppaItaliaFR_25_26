@@ -493,3 +493,15 @@ footer {
     justify-content: center;
   }
 }
+
+.filter-item:hover {
+  background: var(--ita-green);
+  color: white;
+  border-color: var(--ita-green);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.filter-item:hover small {
+  color: rgba(255, 255, 255, 0.9);
+}
