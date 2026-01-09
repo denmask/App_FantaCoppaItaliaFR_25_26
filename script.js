@@ -350,19 +350,20 @@ function updateRanking() {
 
 function filterMatches(selectedTeams) {
   const calendarContainer = document.getElementById("calendario-live");
-  
+
   if (!selectedTeams || selectedTeams.length === 0) {
     const turnoWrappers = document.querySelectorAll(".turno-wrapper");
-    turnoWrappers.forEach(wrapper => wrapper.style.display = "none");
-    
-    let noMatchesMsg = calendarContainer.querySelector('.no-matches-message');
+    turnoWrappers.forEach((wrapper) => (wrapper.style.display = "none"));
+
+    let noMatchesMsg = calendarContainer.querySelector(".no-matches-message");
     if (!noMatchesMsg) {
-      noMatchesMsg = document.createElement('div');
-      noMatchesMsg.className = 'no-matches-message';
-      noMatchesMsg.textContent = '🚫 Nessuna squadra disponibile per i filtri impostati';
+      noMatchesMsg = document.createElement("div");
+      noMatchesMsg.className = "no-matches-message";
+      noMatchesMsg.textContent =
+        "🚫 Nessuna squadra disponibile per i filtri impostati";
       calendarContainer.appendChild(noMatchesMsg);
     }
-    noMatchesMsg.style.display = 'block';
+    noMatchesMsg.style.display = "block";
     return;
   }
 
@@ -394,19 +395,20 @@ function filterMatches(selectedTeams) {
     }
   });
 
-  let noMatchesMsg = calendarContainer.querySelector('.no-matches-message');
-  
+  let noMatchesMsg = calendarContainer.querySelector(".no-matches-message");
+
   if (!anyVisible) {
     if (!noMatchesMsg) {
-      noMatchesMsg = document.createElement('div');
-      noMatchesMsg.className = 'no-matches-message';
-      noMatchesMsg.textContent = '🚫 Nessuna squadra disponibile per i filtri impostati';
+      noMatchesMsg = document.createElement("div");
+      noMatchesMsg.className = "no-matches-message";
+      noMatchesMsg.textContent =
+        "🚫 Nessuna squadra disponibile per i filtri impostati";
       calendarContainer.appendChild(noMatchesMsg);
     }
-    noMatchesMsg.style.display = 'block';
+    noMatchesMsg.style.display = "block";
   } else {
     if (noMatchesMsg) {
-      noMatchesMsg.style.display = 'none';
+      noMatchesMsg.style.display = "none";
     }
   }
 }
