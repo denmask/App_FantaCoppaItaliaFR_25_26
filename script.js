@@ -18,14 +18,12 @@ function init() {
   buildFilters();
   renderCalendar();
   updateRanking();
+  document.getElementById("palmares-box").textContent = db.palmares;
 }
-
-// ========== FILTRI ==========
 
 function buildFilters() {
   const container = document.getElementById("filter-container");
 
-  // Checkbox "Tutti"
   const allDiv = document.createElement("div");
   allDiv.className = "filter-item";
   allDiv.innerHTML = `
@@ -34,7 +32,6 @@ function buildFilters() {
   `;
   container.appendChild(allDiv);
 
-  // Checkbox per ogni fantallenatore
   db.squadreFanta.forEach((s, index) => {
     const id = `chk-${index}`;
     const div = document.createElement("div");
@@ -46,7 +43,6 @@ function buildFilters() {
     container.appendChild(div);
   });
 
-  // Gestione cambiamento checkbox
   container.addEventListener("change", (event) => {
     const target = event.target;
 
@@ -85,31 +81,33 @@ function applyFilterFromCheckbox() {
   filterMatches(selectedTeams);
 }
 
-// ========== CALENDARIO ==========
-
 function renderCalendar() {
   const container = document.getElementById("calendario-live");
   container.innerHTML = "";
 
   for (const turno in db.calendario) {
     const wrapper = document.createElement("div");
+    wrapper.className = "turno-wrapper";
+    wrapper.dataset.turno = turno;
 
     const title = document.createElement("h3");
     title.className = "turno-title";
     title.textContent = turno.toUpperCase();
     wrapper.appendChild(title);
 
+    const matchesContainer = document.createElement("div");
+    matchesContainer.className = "matches-container";
+
     db.calendario[turno].partite.forEach((p) => {
       const card = createMatchCard(p);
-      wrapper.appendChild(card);
+      matchesContainer.appendChild(card);
     });
 
+    wrapper.appendChild(matchesContainer);
     container.appendChild(wrapper);
   }
-
-  // Palmares
-  document.getElementById("palmares-box").textContent = db.palmares;
 }
+
 function createMatchCard(partita) {
   const card = document.createElement("div");
   card.className = "match-card";
@@ -175,7 +173,6 @@ function analyzeMatch(partita) {
     return { winner: null, text: "Da giocare", penalties: false };
   }
 
-  // Verifica rigori
   if (partita.rigori) {
     const [rCasa, rOspite] = partita.rigori.split("-").map((n) => parseInt(n));
     const fCasa = db.squadreFanta.find((s) => s.squadra === partita.casa);
@@ -198,7 +195,6 @@ function analyzeMatch(partita) {
     }
   }
 
-  // Vittoria normale
   if (gCasa > gOspite) {
     const fCasa = db.squadreFanta.find((s) => s.squadra === partita.casa);
     const nome = fCasa ? ` (${fCasa.fantallenatore})` : "";
@@ -219,8 +215,6 @@ function analyzeMatch(partita) {
     return { winner: null, text: "⚖️ Pareggio", penalties: false };
   }
 }
-
-// ========== CLASSIFICA ==========
 
 function updateRanking() {
   const container = document.getElementById("ranking-container");
@@ -247,11 +241,9 @@ function updateRanking() {
             const scoreOspite = parseInt(res[1]);
 
             if (!isNaN(scoreCasa) && !isNaN(scoreOspite)) {
-              // Verifica eliminazione e calcola gol
               let isEliminated = false;
 
               if (p.rigori) {
-                // Con rigori: conta solo gol partita + 1 se vinci ai rigori
                 if (p.casa === s.squadra) {
                   totalGoals += scoreCasa;
                 } else {
@@ -273,7 +265,6 @@ function updateRanking() {
                   totalGoals += 1;
                 }
               } else {
-                // Senza rigori: conta tutti i gol normalmente
                 if (p.casa === s.squadra) {
                   totalGoals += scoreCasa;
                 } else {
@@ -307,15 +298,9 @@ function updateRanking() {
     };
   });
 
-  // Ordinamento: peso turno, poi stato eliminazione, poi gol totali (solo a parità)
   ranking.sort((a, b) => {
-    // Prima: peso turno
     if (b.weight !== a.weight) return b.weight - a.weight;
-
-    // Seconda: stato eliminazione
     if (a.eliminated !== b.eliminated) return a.eliminated - b.eliminated;
-
-    // Terza: gol totali (solo se stesso turno E stesso stato)
     return b.totalGoals - a.totalGoals;
   });
 
@@ -327,7 +312,6 @@ function updateRanking() {
       let badgeClass;
       let turnoText = r.maxTurno;
 
-      // Determina il testo del turno con preposizione corretta
       if (r.maxTurno === "ottavi") {
         turnoText = "agli ottavi";
       } else if (r.maxTurno === "quarti") {
@@ -364,19 +348,65 @@ function updateRanking() {
     .join("");
 }
 
-// ========== FILTRO VISIBILITÀ ==========
-
 function filterMatches(selectedTeams) {
-  document.querySelectorAll(".match-card").forEach((card) => {
-    if (!selectedTeams || selectedTeams.length === 0) {
-      card.style.display = "flex";
-      return;
+  const calendarContainer = document.getElementById("calendario-live");
+  
+  if (!selectedTeams || selectedTeams.length === 0) {
+    const turnoWrappers = document.querySelectorAll(".turno-wrapper");
+    turnoWrappers.forEach(wrapper => wrapper.style.display = "none");
+    
+    let noMatchesMsg = calendarContainer.querySelector('.no-matches-message');
+    if (!noMatchesMsg) {
+      noMatchesMsg = document.createElement('div');
+      noMatchesMsg.className = 'no-matches-message';
+      noMatchesMsg.textContent = '🚫 Nessuna squadra disponibile per i filtri impostati';
+      calendarContainer.appendChild(noMatchesMsg);
     }
+    noMatchesMsg.style.display = 'block';
+    return;
+  }
 
-    const hasMatch = selectedTeams.some((team) =>
-      card.dataset.teams.includes(team)
-    );
+  const turnoWrappers = document.querySelectorAll(".turno-wrapper");
+  let anyVisible = false;
 
-    card.style.display = hasMatch ? "flex" : "none";
+  turnoWrappers.forEach((turnoWrapper) => {
+    const matchCards = turnoWrapper.querySelectorAll(".match-card");
+    let hasVisibleMatch = false;
+
+    matchCards.forEach((card) => {
+      const hasMatch = selectedTeams.some((team) =>
+        card.dataset.teams.includes(team)
+      );
+
+      if (hasMatch) {
+        card.style.display = "flex";
+        hasVisibleMatch = true;
+      } else {
+        card.style.display = "none";
+      }
+    });
+
+    if (hasVisibleMatch) {
+      turnoWrapper.style.display = "block";
+      anyVisible = true;
+    } else {
+      turnoWrapper.style.display = "none";
+    }
   });
+
+  let noMatchesMsg = calendarContainer.querySelector('.no-matches-message');
+  
+  if (!anyVisible) {
+    if (!noMatchesMsg) {
+      noMatchesMsg = document.createElement('div');
+      noMatchesMsg.className = 'no-matches-message';
+      noMatchesMsg.textContent = '🚫 Nessuna squadra disponibile per i filtri impostati';
+      calendarContainer.appendChild(noMatchesMsg);
+    }
+    noMatchesMsg.style.display = 'block';
+  } else {
+    if (noMatchesMsg) {
+      noMatchesMsg.style.display = 'none';
+    }
+  }
 }

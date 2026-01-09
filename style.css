@@ -21,8 +21,7 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", sans-serif;
   background: var(--bg-primary);
   color: var(--text-primary);
   line-height: 1.6;
@@ -31,20 +30,13 @@ body {
   padding-top: 60px;
 }
 
-/* ========== HEADER FISSO ========== */
-
 .tricolore-bar {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   height: 8px;
-  background: linear-gradient(
-    90deg,
-    var(--ita-green) 33%,
-    var(--ita-white) 33% 66%,
-    var(--ita-red) 66%
-  );
+  background: linear-gradient(90deg, var(--ita-green) 33%, var(--ita-white) 33% 66%, var(--ita-red) 66%);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   z-index: 1000;
 }
@@ -82,13 +74,6 @@ header h1 {
   font-weight: 900;
 }
 
-.trophy-icon,
-.season-badge {
-  display: none;
-}
-
-/* ========== MAIN ========== */
-
 main {
   max-width: 1100px;
   margin: 0 auto;
@@ -112,7 +97,7 @@ section:hover {
 .section-title {
   font-size: clamp(1.4rem, 3.5vw, 1.75rem);
   font-weight: 800;
-  color: var(--ita-green);
+  color: var(--ita-red);
   margin-bottom: 0.5rem;
   display: flex;
   align-items: center;
@@ -123,17 +108,11 @@ section:hover {
   font-size: 1.5rem;
 }
 
-.ranking-title {
-  color: var(--ita-red);
-}
-
 .section-subtitle {
   color: var(--text-secondary);
   margin-bottom: 1.25rem;
   font-size: clamp(0.9rem, 2.3vw, 1rem);
 }
-
-/* ========== FILTRI ========== */
 
 #filter-container {
   display: flex;
@@ -187,8 +166,6 @@ section:hover {
   transition: color 0.3s ease;
 }
 
-/* ========== CALENDARIO ========== */
-
 .turno-title {
   font-size: clamp(1.2rem, 3vw, 1.5rem);
   font-weight: 800;
@@ -197,11 +174,15 @@ section:hover {
   padding-bottom: 0.65rem;
   border-bottom: 3px solid var(--ita-red);
   letter-spacing: 1px;
-  color: var(--ita-green);
+  color: var(--ita-red);
 }
 
 .turno-title:first-child {
   margin-top: 0;
+}
+
+.turno-wrapper {
+  margin-bottom: 2rem;
 }
 
 .match-card {
@@ -240,7 +221,7 @@ section:hover {
 }
 
 .team-winner {
-  color: var(--ita-red);
+  color: var(--ita-green);
   font-weight: 800;
 }
 
@@ -258,7 +239,7 @@ section:hover {
 }
 
 .winner-text.penalties {
-  color: var(--ita-green);
+  color: var(--text-secondary);
   font-weight: 600;
 }
 
@@ -291,8 +272,6 @@ section:hover {
   font-weight: 700;
   box-shadow: 0 2px 8px rgba(0, 140, 69, 0.25);
 }
-
-/* ========== CLASSIFICA ========== */
 
 #ranking-container {
   display: flex;
@@ -398,16 +377,13 @@ section:hover {
 }
 
 @keyframes pulse {
-  0%,
-  100% {
+  0%, 100% {
     transform: scale(1);
   }
   50% {
     transform: scale(1.05);
   }
 }
-
-/* ========== PALMARES ========== */
 
 #palmares-box {
   background: #f8f9fa;
@@ -421,7 +397,13 @@ section:hover {
   box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
-/* ========== FOOTER ========== */
+.no-matches-message {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-secondary);
+  font-size: clamp(1rem, 2.5vw, 1.2rem);
+  font-weight: 600;
+}
 
 footer {
   background: var(--text-primary);
@@ -431,8 +413,6 @@ footer {
   margin-top: 3rem;
   font-size: clamp(0.85rem, 2.2vw, 0.95rem);
 }
-
-/* ========== RESPONSIVE ========== */
 
 @media (max-width: 768px) {
   body {
@@ -497,37 +477,4 @@ footer {
     min-width: 130px;
     justify-content: center;
   }
-}
-
-.team-name {
-  color: var(--text-primary);
-}
-
-.team-winner {
-  color: var(--ita-green);
-  font-weight: 800;
-}
-.score {
-  background: var(--ita-red);
-  color: white;
-  padding: 0.65rem 1.25rem;
-  border-radius: var(--radius-sm);
-  font-weight: 800;
-  font-size: clamp(1rem, 2.8vw, 1.2rem);
-  min-width: 75px;
-  text-align: center;
-  box-shadow: 0 4px 12px rgba(205, 33, 42, 0.25);
-  letter-spacing: 1px;
-}
-
-.winner-text {
-  font-size: clamp(0.85rem, 2.3vw, 0.95rem);
-  color: var(--text-secondary);
-  font-weight: 500;
-  margin-top: 0.25rem;
-}
-
-.winner-text.penalties {
-  color: var(--text-secondary);
-  font-weight: 600;
 }
