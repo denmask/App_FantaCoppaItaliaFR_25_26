@@ -110,7 +110,7 @@
         { "casa": "Inter", "ospite": "Venezia", "risultato": "5-1" },
         { "casa": "Bologna", "ospite": "Parma", "risultato": "2-1" },
         { "casa": "Lazio", "ospite": "Milan", "risultato": "1-0" },
-        { "casa": "Roma", "ospite": "Torino", "risultato": "Da giocare" },
+        { "casa": "Roma", "ospite": "Torino", "risultato": "2-3" },
         { "casa": "Fiorentina", "ospite": "Como", "risultato": "Da giocare" }
       ]
     },
@@ -118,7 +118,7 @@
       "partite": [
         { "casa": "Atalanta", "ospite": "Juventus", "risultato": "Da giocare" },
         { "casa": "Bologna", "ospite": "Lazio", "risultato": "Da giocare" },
-        { "casa": "Inter", "ospite": "Roma/Torino", "risultato": "Da giocare" },
+        { "casa": "Inter", "ospite": "Torino", "risultato": "Da giocare" },
         {
           "casa": "Napoli",
           "ospite": "Fiorentina/Como",
@@ -134,7 +134,7 @@
           "risultato": "Da giocare"
         },
         {
-          "casa": "Vincente Inter/Roma",
+          "casa": "Vincente Inter/Torino",
           "ospite": "Vincente Napoli/Fiorentina/Como",
           "risultato": "Da giocare"
         }
