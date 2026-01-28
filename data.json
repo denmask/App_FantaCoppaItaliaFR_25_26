@@ -111,7 +111,7 @@
         { "casa": "Bologna", "ospite": "Parma", "risultato": "2-1" },
         { "casa": "Lazio", "ospite": "Milan", "risultato": "1-0" },
         { "casa": "Roma", "ospite": "Torino", "risultato": "2-3" },
-        { "casa": "Fiorentina", "ospite": "Como", "risultato": "Da giocare" }
+        { "casa": "Fiorentina", "ospite": "Como", "risultato": "1-3" }
       ]
     },
     "quarti": {
@@ -119,13 +119,8 @@
         { "casa": "Atalanta", "ospite": "Juventus", "risultato": "Da giocare" },
         { "casa": "Bologna", "ospite": "Lazio", "risultato": "Da giocare" },
         { "casa": "Inter", "ospite": "Torino", "risultato": "Da giocare" },
-        {
-          "casa": "Napoli",
-          "ospite": "Fiorentina/Como",
-          "risultato": "Da giocare"
-        }
-      ]
-    },
+        { "casa": "Napoli", "ospite": "Como", "risultato": "Da giocare" }]
+      },
     "semifinali": {
       "partite": [
         {
