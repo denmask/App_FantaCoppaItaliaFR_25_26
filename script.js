@@ -19,6 +19,7 @@ function init() {
   renderCalendar();
   updateRanking();
   document.getElementById("palmares-box").textContent = db.palmares;
+  setupWhatsAppShare();
 }
 
 function buildFilters() {
@@ -304,6 +305,9 @@ function updateRanking() {
     return b.totalGoals - a.totalGoals;
   });
 
+  // Store ranking globally for WhatsApp sharing
+  window.currentRanking = ranking;
+
   container.innerHTML = ranking
     .map((r, index) => {
       const posizione = index + 1;
@@ -346,6 +350,66 @@ function updateRanking() {
       `;
     })
     .join("");
+}
+
+function setupWhatsAppShare() {
+  const shareBtn = document.getElementById("share-whatsapp");
+  
+  shareBtn.addEventListener("click", () => {
+    const message = generateWhatsAppMessage();
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, "_blank");
+  });
+}
+
+function generateWhatsAppMessage() {
+  const ranking = window.currentRanking || [];
+  
+  let message = `🏆 *${db.nomeTorneo}* 🏆\n`;
+  message += `━━━━━━━━━━━━━━━━━━━\n\n`;
+  message += `📊 *CLASSIFICA AVANZAMENTO*\n\n`;
+
+  ranking.forEach((r, index) => {
+    const posizione = index + 1;
+    let emoji = "";
+    
+    if (posizione === 1) emoji = "🥇";
+    else if (posizione === 2) emoji = "🥈";
+    else if (posizione === 3) emoji = "🥉";
+    else emoji = `${posizione}.`;
+
+    let status = "";
+    let turnoText = r.maxTurno;
+
+    if (r.maxTurno === "ottavi") {
+      turnoText = "Ottavi";
+    } else if (r.maxTurno === "quarti") {
+      turnoText = "Quarti";
+    } else if (r.maxTurno === "semifinali") {
+      turnoText = "Semifinale";
+    } else if (r.maxTurno === "finale") {
+      turnoText = "Finale";
+    }
+
+    if (r.maxTurno === "finale" && !r.eliminated) {
+      status = "🏆 CAMPIONE";
+    } else if (r.eliminated) {
+      status = `❌ Eliminato (${turnoText})`;
+    } else {
+      status = `✅ In gara (${turnoText})`;
+    }
+
+    message += `${emoji} *${r.fantallenatore}*\n`;
+    message += `   ${r.squadra} - ${status}\n`;
+    message += `   ⚽ ${r.totalGoals} gol totali\n\n`;
+  });
+
+  message += `━━━━━━━━━━━━━━━━━━━\n`;
+  message += `🏅 *Albo d'Oro*\n`;
+  message += `${db.palmares}\n\n`;
+  message += `_Fantacoppa Italia Frecciarossa 2025/26_`;
+
+  return message;
 }
 
 function filterMatches(selectedTeams) {
