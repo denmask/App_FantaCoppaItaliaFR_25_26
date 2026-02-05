@@ -483,3 +483,256 @@ function filterMatches(selectedTeams) {
     noMatchesMsg.style.display = "none";
   }
 }
+
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  fetch("data.json")
+    .then((r) => r.json())
+    .then((data) => {
+      db = data;
+      init();
+    })
+    .catch((err) => {
+      console.error("Errore nel caricamento dei dati:", err);
+      document.getElementById("calendario-live").innerHTML =
+        '<p style="color:#cd212a;font-weight:600;">Errore nel caricamento dei dati del torneo.</p>';
+    });
+});
+
+function init() {
+  buildFilters();
+  renderCalendar();
+  updateRanking();
+  document.getElementById("palmares-box").textContent = db.palmares;
+  setupWhatsAppShare();
+}
+
+/* --- FILTRI --- */
+
+function buildFilters() {
+  const container = document.getElementById("filter-container");
+  if (!container) return;
+
+  const allDiv = document.createElement("div");
+  allDiv.className = "filter-item";
+  allDiv.innerHTML = `
+    <input type="checkbox" id="chk-all" checked />
+    <label for="chk-all"><strong>Tutti</strong></label>
+  `;
+  container.appendChild(allDiv);
+
+  db.squadreFanta.forEach((s, index) => {
+    const id = `chk-${index}`;
+    const div = document.createElement("div");
+    div.className = "filter-item";
+    div.innerHTML = `
+      <input type="checkbox" id="${id}" data-squadra="${s.squadra}" checked />
+      <label for="${id}">${s.fantallenatore}<br/><small>${s.squadra}</small></label>
+    `;
+    container.appendChild(div);
+  });
+
+  container.addEventListener("change", (e) => {
+    if (e.target.id === "chk-all") {
+      const isChecked = e.target.checked;
+      container.querySelectorAll('input[type="checkbox"]').forEach(c => c.checked = isChecked);
+    } else {
+      const checkboxes = Array.from(container.querySelectorAll('input[type="checkbox"][data-squadra]'));
+      document.getElementById("chk-all").checked = checkboxes.every(c => c.checked);
+    }
+    applyFilters();
+  });
+}
+
+function applyFilters() {
+  const selectedTeams = Array.from(document.querySelectorAll('input[type="checkbox"][data-squadra]:checked'))
+    .map(c => c.dataset.squadra);
+  
+  const allChecked = document.getElementById("chk-all").checked;
+  const teamsToFilter = allChecked ? db.squadreFanta.map(s => s.squadra) : selectedTeams;
+
+  document.querySelectorAll(".turno-wrapper").forEach(wrapper => {
+    let hasMatch = false;
+    wrapper.querySelectorAll(".match-card").forEach(card => {
+      const cardTeams = card.dataset.teams.split(",");
+      const isVisible = teamsToFilter.some(t => cardTeams.includes(t));
+      card.style.display = isVisible ? "flex" : "none";
+      if (isVisible) hasMatch = true;
+    });
+    wrapper.style.display = hasMatch ? "block" : "none";
+  });
+}
+
+/* --- CALENDARIO --- */
+
+function renderCalendar() {
+  const container = document.getElementById("calendario-live");
+  container.innerHTML = "";
+
+  for (const turno in db.calendario) {
+    const wrapper = document.createElement("div");
+    wrapper.className = "turno-wrapper";
+    wrapper.innerHTML = `
+      <h3 class="turno-title">${turno.toUpperCase()}</h3>
+      <div class="matches-container"></div>
+    `;
+    
+    const matchesDiv = wrapper.querySelector(".matches-container");
+    db.calendario[turno].partite.forEach(p => {
+      matchesDiv.appendChild(createMatchCard(p));
+    });
+    container.appendChild(wrapper);
+  }
+}
+
+function createMatchCard(partita) {
+  const card = document.createElement("div");
+  card.className = "match-card";
+  card.dataset.teams = `${partita.casa},${partita.ospite}`;
+
+  const fCasa = db.squadreFanta.find(s => s.squadra === partita.casa);
+  const fOspite = db.squadreFanta.find(s => s.squadra === partita.ospite);
+  
+  const result = analyzeMatch(partita);
+  const tipoBadge = partita.tipo ? `<span class="tipo-match">${partita.tipo}</span>` : "";
+
+  card.innerHTML = `
+    <div class="match-info">
+      <div class="match-teams">
+        <span class="team-name ${result.winner === 'casa' ? 'team-winner' : ''}">
+          ${fCasa ? `${partita.casa} (${fCasa.fantallenatore})` : partita.casa}
+        </span>
+        <span class="vs-text">vs</span>
+        <span class="team-name ${result.winner === 'ospite' ? 'team-winner' : ''}">
+          ${fOspite ? `${partita.ospite} (${fOspite.fantallenatore})` : partita.ospite}
+        </span>
+      </div>
+      <div class="winner-text ${result.penalties ? 'penalties' : ''}">${result.text}</div>
+    </div>
+    <div class="score-container">
+      ${tipoBadge}
+      <div class="score">${partita.risultato}</div>
+      ${partita.rigori ? `<div class="penalties-score">RIG: ${partita.rigori}</div>` : ""}
+    </div>
+  `;
+  return card;
+}
+
+function analyzeMatch(p) {
+  if (!p.risultato || p.risultato === "Da giocare") return { winner: null, text: "Da giocare" };
+  
+  // Se ci sono i rigori, domina il risultato dei rigori
+  if (p.rigori && p.rigori !== "") {
+    const [rC, rO] = p.rigori.split("-").map(Number);
+    return { 
+      winner: rC > rO ? "casa" : "ospite", 
+      text: `Vince ai rigori ${rC > rO ? p.casa : p.ospite}`,
+      penalties: true 
+    };
+  }
+
+  const [gC, gO] = p.risultato.split("-").map(Number);
+  if (gC > gO) return { winner: "casa", text: `Vince ${p.casa}` };
+  if (gO > gC) return { winner: "ospite", text: `Vince ${p.ospite}` };
+  return { winner: null, text: "Pareggio" };
+}
+
+/* --- LOGICA CLASSIFICA E AVANZAMENTO --- */
+
+function updateRanking() {
+  const container = document.getElementById("ranking-container");
+  const weights = { preliminari: 0, trentaduesimi: 1, sedicesimi: 2, ottavi: 3, quarti: 4, semifinali: 5, finale: 6 };
+
+  let ranking = db.squadreFanta.map(s => {
+    let maxTurno = "Nessuno", weight = -1, eliminated = false, totalGoals = 0;
+
+    for (const turno in db.calendario) {
+      const partite = db.calendario[turno].partite;
+      const miePartite = partite.filter(p => p.casa === s.squadra || p.ospite === s.squadra);
+
+      if (miePartite.length > 0) {
+        if (weights[turno] > weight) {
+          maxTurno = turno;
+          weight = weights[turno];
+        }
+
+        // LOGICA SPECIALE SEMIFINALI (ANDATA/RITORNO)
+        if (turno === "semifinali") {
+          let gFatti = 0, gSubiti = 0, haRitorno = false, rigPersi = false;
+          
+          miePartite.forEach(p => {
+            if (p.risultato !== "Da giocare") {
+              const [c, o] = p.risultato.split("-").map(Number);
+              if (p.casa === s.squadra) { gFatti += c; gSubiti += o; } 
+              else { gFatti += o; gSubiti += c; }
+
+              if (p.tipo === "Ritorno") {
+                haRitorno = true;
+                if (p.rigori) {
+                  const [rc, ro] = p.rigori.split("-").map(Number);
+                  if ((p.casa === s.squadra && ro > rc) || (p.ospite === s.squadra && rc > ro)) rigPersi = true;
+                }
+              }
+            }
+          });
+          totalGoals += gFatti;
+          // Eliminato se: ha giocato il ritorno E (ha subito più gol totali O ha perso ai rigori)
+          if (haRitorno && (gSubiti > gFatti || (gFatti === gSubiti && rigPersi))) eliminated = true;
+        } 
+        
+        // LOGICA STANDARD (GARA SECCA)
+        else {
+          miePartite.forEach(p => {
+            if (p.risultato !== "Da giocare") {
+              const [c, o] = p.risultato.split("-").map(Number);
+              const isCasa = p.casa === s.squadra;
+              totalGoals += isCasa ? c : o;
+              
+              const vinceCasa = c > o || (p.rigori && Number(p.rigori.split("-")[0]) > Number(p.rigori.split("-")[1]));
+              const vinceOspite = o > c || (p.rigori && Number(p.rigori.split("-")[1]) > Number(p.rigori.split("-")[0]));
+
+              if ((isCasa && vinceOspite) || (!isCasa && vinceCasa)) eliminated = true;
+            }
+          });
+        }
+      }
+    }
+    return { ...s, maxTurno, weight, eliminated, totalGoals };
+  });
+
+  // Ordinamento: per importanza turno, poi per stato (in gara prima), poi per gol
+  ranking.sort((a, b) => (b.weight - a.weight) || (a.eliminated - b.eliminated) || (b.totalGoals - a.totalGoals));
+  
+  window.currentRanking = ranking;
+
+  container.innerHTML = ranking.map((r, i) => {
+    let status = r.eliminated ? `Uscito (${r.maxTurno})` : `In gara (${r.maxTurno})`;
+    if (r.maxTurno === "finale" && !r.eliminated) status = "🔥 Finalista";
+    
+    return `
+      <div class="ranking-row">
+        <div class="rank-info">
+          <span class="rank-position">${i + 1}</span>
+          <div class="rank-name">${r.fantallenatore} <span>(${r.squadra})</span></div>
+        </div>
+        <div class="rank-badge ${r.eliminated ? 'eliminato' : 'in-gara'}">${status}</div>
+      </div>
+    `;
+  }).join("");
+}
+
+/* --- UTILS --- */
+
+function setupWhatsAppShare() {
+  const btn = document.getElementById("share-whatsapp");
+  if (!btn) return;
+  btn.addEventListener("click", () => {
+    let testo = "*🏆 CLASSIFICA FANTACOPPA 25-26 🏆*\n\n";
+    window.currentRanking.forEach((r, i) => {
+      const icon = r.eliminated ? "❌" : "✅";
+      testo += `${i+1}. ${icon} *${r.fantallenatore}* (${r.maxTurno})\n`;
+    });
+    window.open(`https://wa.me/?text=${encodeURIComponent(testo)}`, "_blank");
+  });
+}

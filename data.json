@@ -119,19 +119,34 @@
         { "casa": "Atalanta", "ospite": "Juventus", "risultato": "Da giocare" },
         { "casa": "Bologna", "ospite": "Lazio", "risultato": "Da giocare" },
         { "casa": "Inter", "ospite": "Torino", "risultato": "2-1" },
-        { "casa": "Napoli", "ospite": "Como", "risultato": "Da giocare" }]
-      },
+        { "casa": "Napoli", "ospite": "Como", "risultato": "Da giocare" }
+      ]
+    },
     "semifinali": {
       "partite": [
         {
-          "casa": "Vincente Bologna/Lazio",
-          "ospite": "Vincente Atalanta/Juventus",
-          "risultato": "Da giocare"
+          "casa": "Bologna/Lazio",
+          "ospite": "Atalanta/Juventus",
+          "risultato": "Da giocare",
+          "tipo": "Andata"
+        },
+        {
+          "casa": "Atalanta/Juventus",
+          "ospite": "Bologna/Lazio",
+          "risultato": "Da giocare",
+          "tipo": "Ritorno"
         },
         {
           "casa": "Inter",
-          "ospite": "Vincente Napoli/Como",
-          "risultato": "Da giocare"
+          "ospite": "Napoli/Como",
+          "risultato": "Da giocare",
+          "tipo": "Andata"
+        },
+        {
+          "casa": "Napoli/Como",
+          "ospite": "Inter",
+          "risultato": "Da giocare",
+          "tipo": "Ritorno"
         }
       ]
     },
