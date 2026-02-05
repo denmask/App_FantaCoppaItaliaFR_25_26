@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
     .catch((err) => {
       console.error("Errore nel caricamento dei dati:", err);
       document.getElementById("calendario-live").innerHTML =
-        '<p style="color: #cd212a; font-weight: 600;">Errore nel caricamento dei dati del torneo.</p>';
+        '<p style="color:#cd212a;font-weight:600;">Errore nel caricamento dei dati del torneo.</p>';
     });
 });
 
@@ -19,26 +19,33 @@ function init() {
   renderCalendar();
   updateRanking();
   document.getElementById("palmares-box").textContent = db.palmares;
+  setupWhatsAppShare();
 }
+
+/* FILTRI */
 
 function buildFilters() {
   const container = document.getElementById("filter-container");
 
+  // Checkbox "Tutti"
   const allDiv = document.createElement("div");
   allDiv.className = "filter-item";
   allDiv.innerHTML = `
-    <input type="checkbox" id="chk-all" checked>
-    <label for="chk-all"><strong>✨ Tutti</strong></label>
+    <input type="checkbox" id="chk-all" checked />
+    <label for="chk-all"><strong>Tutti</strong></label>
   `;
   container.appendChild(allDiv);
 
+  // Singole squadre
   db.squadreFanta.forEach((s, index) => {
     const id = `chk-${index}`;
     const div = document.createElement("div");
     div.className = "filter-item";
     div.innerHTML = `
-      <input type="checkbox" id="${id}" data-squadra="${s.squadra}" checked>
-      <label for="${id}">${s.fantallenatore}<br><small>(${s.squadra})</small></label>
+      <input type="checkbox" id="${id}" data-squadra="${s.squadra}" checked />
+      <label for="${id}">
+        ${s.fantallenatore}<br/><small>${s.squadra}</small>
+      </label>
     `;
     container.appendChild(div);
   });
@@ -48,9 +55,11 @@ function buildFilters() {
 
     if (target.id === "chk-all") {
       const allChecked = target.checked;
-      container.querySelectorAll('input[type="checkbox"]').forEach((chk) => {
-        chk.checked = allChecked;
-      });
+      container
+        .querySelectorAll('input[type="checkbox"]')
+        .forEach((chk) => {
+          chk.checked = allChecked;
+        });
     } else {
       const checkboxes = Array.from(
         container.querySelectorAll('input[type="checkbox"]')
@@ -67,7 +76,6 @@ function buildFilters() {
 function applyFilterFromCheckbox() {
   const container = document.getElementById("filter-container");
   const chkAll = document.getElementById("chk-all");
-
   let selectedTeams = [];
 
   if (chkAll.checked) {
@@ -80,6 +88,8 @@ function applyFilterFromCheckbox() {
 
   filterMatches(selectedTeams);
 }
+
+/* CALENDARIO */
 
 function renderCalendar() {
   const container = document.getElementById("calendario-live");
@@ -128,21 +138,31 @@ function createMatchCard(partita) {
     winnerHTML = `<div class="winner-text penalties">${matchResult.text}</div>`;
   }
 
-  const scoreHTML =
-    partita.risultato && partita.risultato !== "Da giocare"
-      ? matchResult.penalties
-        ? `<div class="score-container">
-             <div class="score">${partita.risultato}</div>
-             <div class="penalties-score">RIG ${partita.rigori}</div>
-           </div>`
-        : `<div class="score-container">
-             <div class="score">${partita.risultato}</div>
-           </div>`
-      : "";
+  let scoreHTML = "";
+  if (partita.risultato && partita.risultato !== "Da giocare") {
+    if (matchResult.penalties && partita.rigori) {
+      scoreHTML = `
+        <div class="score-container">
+          <div class="score">${partita.risultato}</div>
+          <div class="penalties-score">RIG ${partita.rigori}</div>
+        </div>
+      `;
+    } else {
+      scoreHTML = `
+        <div class="score-container">
+          <div class="score">${partita.risultato}</div>
+        </div>
+      `;
+    }
+  } else {
+    scoreHTML = `
+      <div class="score-container">
+        <div class="score">Da giocare</div>
+      </div>
+    `;
+  }
 
-  const casaName = fCasa
-    ? `${partita.casa} (${fCasa.fantallenatore})`
-    : partita.casa;
+  const casaName = fCasa ? `${partita.casa} (${fCasa.fantallenatore})` : partita.casa;
   const ospiteName = fOspite
     ? `${partita.ospite} (${fOspite.fantallenatore})`
     : partita.ospite;
@@ -164,32 +184,37 @@ function createMatchCard(partita) {
 
 function analyzeMatch(partita) {
   if (!partita.risultato || partita.risultato === "Da giocare") {
-    return { winner: null, text: "🕐 Da giocare", penalties: false };
+    return { winner: null, text: "Da giocare", penalties: false };
   }
 
-  const [gCasa, gOspite] = partita.risultato.split("-").map((n) => parseInt(n));
+  const [gCasa, gOspite] = partita.risultato
+    .split("-")
+    .map((n) => parseInt(n, 10));
 
   if (isNaN(gCasa) || isNaN(gOspite)) {
     return { winner: null, text: "Da giocare", penalties: false };
   }
 
+  // Eventuali rigori
   if (partita.rigori) {
-    const [rCasa, rOspite] = partita.rigori.split("-").map((n) => parseInt(n));
+    const [rCasa, rOspite] = partita.rigori
+      .split("-")
+      .map((n) => parseInt(n, 10));
     const fCasa = db.squadreFanta.find((s) => s.squadra === partita.casa);
     const fOspite = db.squadreFanta.find((s) => s.squadra === partita.ospite);
 
     if (rCasa > rOspite) {
-      const nome = fCasa ? ` (${fCasa.fantallenatore})` : "";
+      const nome = fCasa ? fCasa.fantallenatore : partita.casa;
       return {
         winner: "casa",
-        text: `🏆 Ha vinto ai rigori: ${partita.casa}${nome}`,
+        text: `Ha vinto ai rigori ${partita.casa} (${nome})`,
         penalties: true,
       };
-    } else {
-      const nome = fOspite ? ` (${fOspite.fantallenatore})` : "";
+    } else if (rOspite > rCasa) {
+      const nome = fOspite ? fOspite.fantallenatore : partita.ospite;
       return {
         winner: "ospite",
-        text: `🏆 Ha vinto ai rigori: ${partita.ospite}${nome}`,
+        text: `Ha vinto ai rigori ${partita.ospite} (${nome})`,
         penalties: true,
       };
     }
@@ -197,90 +222,79 @@ function analyzeMatch(partita) {
 
   if (gCasa > gOspite) {
     const fCasa = db.squadreFanta.find((s) => s.squadra === partita.casa);
-    const nome = fCasa ? ` (${fCasa.fantallenatore})` : "";
+    const nome = fCasa ? fCasa.fantallenatore : partita.casa;
     return {
       winner: "casa",
-      text: `🏆 Ha vinto ${partita.casa}${nome}`,
+      text: `Ha vinto ${partita.casa} (${nome})`,
       penalties: false,
     };
   } else if (gOspite > gCasa) {
     const fOspite = db.squadreFanta.find((s) => s.squadra === partita.ospite);
-    const nome = fOspite ? ` (${fOspite.fantallenatore})` : "";
+    const nome = fOspite ? fOspite.fantallenatore : partita.ospite;
     return {
       winner: "ospite",
-      text: `🏆 Ha vinto ${partita.ospite}${nome}`,
+      text: `Ha vinto ${partita.ospite} (${nome})`,
       penalties: false,
     };
-  } else {
-    return { winner: null, text: "⚖️ Pareggio", penalties: false };
   }
+
+  return { winner: null, text: "Pareggio", penalties: false };
 }
+
+/* CLASSIFICA */
 
 function updateRanking() {
   const container = document.getElementById("ranking-container");
-  const weights = { ottavi: 1, quarti: 2, semifinali: 3, finale: 4 };
+
+  const weights = {
+    ottavi: 1,
+    quarti: 2,
+    semifinali: 3,
+    finale: 4,
+  };
 
   let ranking = db.squadreFanta.map((s) => {
     let maxTurno = "Nessuno";
     let weight = 0;
     let eliminated = false;
-    let wonByPenalties = false;
     let totalGoals = 0;
 
     for (const turno in db.calendario) {
       db.calendario[turno].partite.forEach((p) => {
         if (p.casa === s.squadra || p.ospite === s.squadra) {
-          if (weights[turno] >= weight) {
+          if (weights[turno] && weights[turno] > weight) {
             maxTurno = turno;
             weight = weights[turno];
           }
 
-          const res = p.risultato.split("-");
-          if (res.length === 2 && res[0] !== "Da giocare") {
-            const scoreCasa = parseInt(res[0]);
-            const scoreOspite = parseInt(res[1]);
-
-            if (!isNaN(scoreCasa) && !isNaN(scoreOspite)) {
-              let isEliminated = false;
-
-              if (p.rigori) {
+          if (p.risultato && p.risultato !== "Da giocare") {
+            const res = p.risultato.split("-");
+            if (res.length === 2 && res[0] !== "Da giocare") {
+              const scoreCasa = parseInt(res[0], 10);
+              const scoreOspite = parseInt(res[1], 10);
+              if (!isNaN(scoreCasa) && !isNaN(scoreOspite)) {
                 if (p.casa === s.squadra) {
                   totalGoals += scoreCasa;
-                } else {
+                  if (scoreOspite > scoreCasa) {
+                    eliminated = true;
+                  }
+                } else if (p.ospite === s.squadra) {
                   totalGoals += scoreOspite;
+                  if (scoreCasa > scoreOspite) {
+                    eliminated = true;
+                  }
                 }
 
-                const [rCasa, rOspite] = p.rigori
-                  .split("-")
-                  .map((n) => parseInt(n));
-                if (p.casa === s.squadra && rOspite > rCasa) {
-                  isEliminated = true;
-                } else if (p.ospite === s.squadra && rCasa > rOspite) {
-                  isEliminated = true;
-                } else if (p.casa === s.squadra && rCasa > rOspite) {
-                  wonByPenalties = true;
-                  totalGoals += 1;
-                } else if (p.ospite === s.squadra && rOspite > rCasa) {
-                  wonByPenalties = true;
-                  totalGoals += 1;
+                if (p.rigori) {
+                  const [rCasa, rOspite] = p.rigori
+                    .split("-")
+                    .map((n) => parseInt(n, 10));
+                  if (p.casa === s.squadra && rOspite > rCasa) {
+                    eliminated = true;
+                  } else if (p.ospite === s.squadra && rCasa > rOspite) {
+                    eliminated = true;
+                  }
                 }
-              } else {
-                if (p.casa === s.squadra) {
-                  totalGoals += scoreCasa;
-                } else {
-                  totalGoals += scoreOspite;
-                }
-
-                if (
-                  (p.casa === s.squadra && scoreOspite > scoreCasa) ||
-                  (p.ospite === s.squadra && scoreCasa > scoreOspite)
-                ) {
-                  isEliminated = true;
-                }
-              }
-
-              if (isEliminated) {
-                eliminated = true;
               }
             }
           }
@@ -293,7 +307,6 @@ function updateRanking() {
       maxTurno,
       weight,
       eliminated,
-      wonByPenalties,
       totalGoals,
     };
   });
@@ -304,32 +317,30 @@ function updateRanking() {
     return b.totalGoals - a.totalGoals;
   });
 
+  // salviamo per WhatsApp
+  window.currentRanking = ranking;
+
   container.innerHTML = ranking
     .map((r, index) => {
       const posizione = index + 1;
 
-      let statusText;
-      let badgeClass;
-      let turnoText = r.maxTurno;
+      let statusText = "";
+      let badgeClass = "";
 
-      if (r.maxTurno === "ottavi") {
-        turnoText = "agli ottavi";
-      } else if (r.maxTurno === "quarti") {
-        turnoText = "ai quarti";
-      } else if (r.maxTurno === "semifinali") {
-        turnoText = "in semifinale";
-      } else if (r.maxTurno === "finale") {
-        turnoText = "in finale";
-      }
+      let turnoText = "";
+      if (r.maxTurno === "ottavi") turnoText = "agli ottavi";
+      else if (r.maxTurno === "quarti") turnoText = "ai quarti";
+      else if (r.maxTurno === "semifinali") turnoText = "in semifinale";
+      else if (r.maxTurno === "finale") turnoText = "in finale";
 
       if (r.maxTurno === "finale" && !r.eliminated) {
-        statusText = "🏆 Vittoria";
+        statusText = "Vittoria";
         badgeClass = "vittoria-finale";
       } else if (r.eliminated) {
-        statusText = `❌ Uscito ${turnoText}`;
+        statusText = `Uscito ${turnoText}`;
         badgeClass = "eliminato";
       } else {
-        statusText = `✅ In gara (${turnoText})`;
+        statusText = `In gara ${turnoText}`;
         badgeClass = "in-gara";
       }
 
@@ -337,7 +348,9 @@ function updateRanking() {
         <div class="ranking-row">
           <div class="rank-info">
             <span class="rank-position">${posizione}</span>
-            <span class="rank-name">${r.fantallenatore} (${r.squadra})</span>
+            <div class="rank-name">
+              ${r.fantallenatore} <span>(${r.squadra})</span>
+            </div>
           </div>
           <div class="rank-badge ${badgeClass}">
             ${statusText}
@@ -348,19 +361,81 @@ function updateRanking() {
     .join("");
 }
 
+/* WHATSAPP */
+
+function setupWhatsAppShare() {
+  const shareBtn = document.getElementById("share-whatsapp");
+  if (!shareBtn) return;
+
+  shareBtn.addEventListener("click", () => {
+    const message = generateWhatsAppMessage();
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, "_blank");
+  });
+}
+
+function generateWhatsAppMessage() {
+  const ranking = window.currentRanking || [];
+
+  let message = "";
+  message += "*FANTACOPPA ITALIA FRECCIAROSSA 2025-26*\n";
+  message += "*CLASSIFICA AVANZAMENTO*\n";
+  message += "========================\n\n";
+
+  ranking.forEach((r, index) => {
+    const posizione = index + 1;
+
+    let turnoText = "";
+    if (r.maxTurno === "ottavi") turnoText = "Ottavi";
+    else if (r.maxTurno === "quarti") turnoText = "Quarti";
+    else if (r.maxTurno === "semifinali") turnoText = "Semifinale";
+    else if (r.maxTurno === "finale") turnoText = "Finale";
+
+    let statusText = "";
+    if (r.maxTurno === "finale" && !r.eliminated) {
+      statusText = "In gara Finale";
+    } else if (r.eliminated) {
+      statusText = `Eliminato ${turnoText}`;
+    } else {
+      statusText = `In gara ${turnoText}`;
+    }
+
+    message += `${posizione}. *${r.fantallenatore}* ${r.squadra} - ${statusText}\n`;
+  });
+
+  message += "========================\n";
+  message += "*ALBO D'ORO*\n";
+
+  const palmaresLines = db.palmares.split("\n");
+  palmaresLines.forEach((line) => {
+    if (line.trim()) {
+      message += `• ${line.trim()}\n`;
+    }
+  });
+
+  message += "\n_Fantacoppa Italia Frecciarossa 2025/26_";
+
+  return message;
+}
+
+
+/* FILTRO MATCHES */
+
 function filterMatches(selectedTeams) {
   const calendarContainer = document.getElementById("calendario-live");
 
   if (!selectedTeams || selectedTeams.length === 0) {
     const turnoWrappers = document.querySelectorAll(".turno-wrapper");
-    turnoWrappers.forEach((wrapper) => (wrapper.style.display = "none"));
+    turnoWrappers.forEach((wrapper) => {
+      wrapper.style.display = "none";
+    });
 
     let noMatchesMsg = calendarContainer.querySelector(".no-matches-message");
     if (!noMatchesMsg) {
       noMatchesMsg = document.createElement("div");
       noMatchesMsg.className = "no-matches-message";
       noMatchesMsg.textContent =
-        "🚫 Nessuna squadra disponibile per i filtri impostati";
+        "Nessuna squadra disponibile per i filtri impostati.";
       calendarContainer.appendChild(noMatchesMsg);
     }
     noMatchesMsg.style.display = "block";
@@ -378,7 +453,6 @@ function filterMatches(selectedTeams) {
       const hasMatch = selectedTeams.some((team) =>
         card.dataset.teams.includes(team)
       );
-
       if (hasMatch) {
         card.style.display = "flex";
         hasVisibleMatch = true;
@@ -396,19 +470,16 @@ function filterMatches(selectedTeams) {
   });
 
   let noMatchesMsg = calendarContainer.querySelector(".no-matches-message");
-
   if (!anyVisible) {
     if (!noMatchesMsg) {
       noMatchesMsg = document.createElement("div");
       noMatchesMsg.className = "no-matches-message";
       noMatchesMsg.textContent =
-        "🚫 Nessuna squadra disponibile per i filtri impostati";
+        "Nessuna squadra disponibile per i filtri impostati.";
       calendarContainer.appendChild(noMatchesMsg);
     }
     noMatchesMsg.style.display = "block";
-  } else {
-    if (noMatchesMsg) {
-      noMatchesMsg.style.display = "none";
-    }
+  } else if (noMatchesMsg) {
+    noMatchesMsg.style.display = "none";
   }
 }
