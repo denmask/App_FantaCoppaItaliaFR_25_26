@@ -118,7 +118,7 @@
       "partite": [
         { "casa": "Atalanta", "ospite": "Juventus", "risultato": "Da giocare" },
         { "casa": "Bologna", "ospite": "Lazio", "risultato": "Da giocare" },
-        { "casa": "Inter", "ospite": "Torino", "risultato": "Da giocare" },
+        { "casa": "Inter", "ospite": "Torino", "risultato": "2-1" },
         { "casa": "Napoli", "ospite": "Como", "risultato": "Da giocare" }]
       },
     "semifinali": {
