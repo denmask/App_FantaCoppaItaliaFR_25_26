@@ -116,7 +116,7 @@
     },
     "quarti": {
       "partite": [
-        { "casa": "Atalanta", "ospite": "Juventus", "risultato": "Da giocare" },
+        { "casa": "Atalanta", "ospite": "Juventus", "risultato": "3-0" },
         { "casa": "Bologna", "ospite": "Lazio", "risultato": "Da giocare" },
         { "casa": "Inter", "ospite": "Torino", "risultato": "2-1" },
         { "casa": "Napoli", "ospite": "Como", "risultato": "Da giocare" }
@@ -126,12 +126,12 @@
       "partite": [
         {
           "casa": "Bologna/Lazio",
-          "ospite": "Atalanta/Juventus",
+          "ospite": "Atalanta",
           "risultato": "Da giocare",
           "tipo": "Andata"
         },
         {
-          "casa": "Atalanta/Juventus",
+          "casa": "Atalanta",
           "ospite": "Bologna/Lazio",
           "risultato": "Da giocare",
           "tipo": "Ritorno"
