@@ -736,3 +736,115 @@ function setupWhatsAppShare() {
     window.open(`https://wa.me/?text=${encodeURIComponent(testo)}`, "_blank");
   });
 }
+function updateRanking() {
+  const container = document.getElementById("ranking-container");
+  const weights = { preliminari: 0, trentaduesimi: 1, sedicesimi: 2, ottavi: 3, quarti: 4, semifinali: 5, finale: 6 };
+
+  let ranking = db.squadreFanta.map(s => {
+    let maxTurno = "Nessuno", weight = -1, eliminated = false;
+    let totalGoalsFor = 0;
+    let totalGoalsAgainst = 0;
+
+    for (const turno in db.calendario) {
+      const partite = db.calendario[turno].partite;
+      const miePartite = partite.filter(p => p.casa === s.squadra || p.ospite === s.squadra);
+
+      if (miePartite.length > 0) {
+        if (weights[turno] > weight) {
+          maxTurno = turno;
+          weight = weights[turno];
+        }
+
+        // LOGICA SPECIALE SEMIFINALI (ANDATA/RITORNO)
+        if (turno === "semifinali") {
+          let gFattiTurno = 0, gSubitiTurno = 0, haRitorno = false, rigPersi = false;
+          
+          miePartite.forEach(p => {
+            if (p.risultato !== "Da giocare") {
+              const [c, o] = p.risultato.split("-").map(Number);
+              if (p.casa === s.squadra) { 
+                gFattiTurno += c; 
+                gSubitiTurno += o; 
+              } else { 
+                gFattiTurno += o; 
+                gSubitiTurno += c; 
+              }
+
+              if (p.tipo === "Ritorno") {
+                haRitorno = true;
+                if (p.rigori) {
+                  const [rc, ro] = p.rigori.split("-").map(Number);
+                  if ((p.casa === s.squadra && ro > rc) || (p.ospite === s.squadra && rc > ro)) rigPersi = true;
+                }
+              }
+            }
+          });
+          totalGoalsFor += gFattiTurno;
+          totalGoalsAgainst += gSubitiTurno;
+          
+          if (haRitorno && (gSubitiTurno > gFattiTurno || (gFattiTurno === gSubitiTurno && rigPersi))) eliminated = true;
+        } 
+        
+        // LOGICA STANDARD (GARA SECCA)
+        else {
+          miePartite.forEach(p => {
+            if (p.risultato !== "Da giocare") {
+              const [c, o] = p.risultato.split("-").map(Number);
+              const isCasa = p.casa === s.squadra;
+              
+              if (isCasa) {
+                totalGoalsFor += c;
+                totalGoalsAgainst += o;
+              } else {
+                totalGoalsFor += o;
+                totalGoalsAgainst += c;
+              }
+              
+              const vinceCasa = c > o || (p.rigori && Number(p.rigori.split("-")[0]) > Number(p.rigori.split("-")[1]));
+              const vinceOspite = o > c || (p.rigori && Number(p.rigori.split("-")[1]) > Number(p.rigori.split("-")[0]));
+
+              if ((isCasa && vinceOspite) || (!isCasa && vinceCasa)) eliminated = true;
+            }
+          });
+        }
+      }
+    }
+
+    const goalDifference = totalGoalsFor - totalGoalsAgainst;
+
+    return { 
+      ...s, 
+      maxTurno, 
+      weight, 
+      eliminated, 
+      goalDifference 
+    };
+  });
+
+  // Ordinamento: 
+  // 1. Importanza turno (weight)
+  // 2. Stato (chi è ancora in gara prima)
+  // 3. Differenza Reti (goalDifference)
+  ranking.sort((a, b) => 
+    (b.weight - a.weight) || 
+    (a.eliminated - b.eliminated) || 
+    (b.goalDifference - a.goalDifference)
+  );
+  
+  window.currentRanking = ranking;
+
+  container.innerHTML = ranking.map((r, i) => {
+    let status = r.eliminated ? `Uscito (${r.maxTurno})` : `In gara (${r.maxTurno})`;
+    if (r.maxTurno === "finale" && !r.eliminated) status = "🔥 Finalista";
+    
+    return `
+      <div class="ranking-row">
+        <div class="rank-info">
+          <span class="rank-position">${i + 1}</span>
+          <div class="rank-name">${r.fantallenatore} <span>(${r.squadra})</span></div>
+        </div>
+        <div class="rank-badge ${r.eliminated ? 'eliminato' : 'in-gara'}">${status}</div>
+      </div>
+    `;
+  }).join("");
+}
