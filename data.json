@@ -117,7 +117,7 @@
     "quarti": {
       "partite": [
         { "casa": "Atalanta", "ospite": "Juventus", "risultato": "3-0" },
-        { "casa": "Bologna", "ospite": "Lazio", "risultato": "Da giocare" },
+        { "casa": "Bologna", "ospite": "Lazio", "risultato": "1-1", "rigori":"1-4"},
         { "casa": "Inter", "ospite": "Torino", "risultato": "2-1" },
         { "casa": "Napoli", "ospite": "Como", "risultato": "1-1", "rigori": "7-8" }
       ]
@@ -125,14 +125,14 @@
     "semifinali": {
       "partite": [
         {
-          "casa": "Bologna/Lazio",
+          "casa": "Lazio",
           "ospite": "Atalanta",
           "risultato": "Da giocare",
           "tipo": "Andata"
         },
         {
           "casa": "Atalanta",
-          "ospite": "Bologna/Lazio",
+          "ospite": "Lazio",
           "risultato": "Da giocare",
           "tipo": "Ritorno"
         },
