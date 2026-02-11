@@ -119,7 +119,7 @@
         { "casa": "Atalanta", "ospite": "Juventus", "risultato": "3-0" },
         { "casa": "Bologna", "ospite": "Lazio", "risultato": "Da giocare" },
         { "casa": "Inter", "ospite": "Torino", "risultato": "2-1" },
-        { "casa": "Napoli", "ospite": "Como", "risultato": "Da giocare" }
+        { "casa": "Napoli", "ospite": "Como", "risultato": "1-1", "rigori": "7-8" }
       ]
     },
     "semifinali": {
@@ -138,12 +138,12 @@
         },
         {
           "casa": "Inter",
-          "ospite": "Napoli/Como",
+          "ospite": "Como",
           "risultato": "Da giocare",
           "tipo": "Andata"
         },
         {
-          "casa": "Napoli/Como",
+          "casa": "Como",
           "ospite": "Inter",
           "risultato": "Da giocare",
           "tipo": "Ritorno"
